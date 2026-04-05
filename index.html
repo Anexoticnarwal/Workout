@@ -3,62 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pro Wellness Suite</title>
+    <title>Elite Wellness Suite</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --accent: #38bdf8; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); overflow-x: hidden; }
-        .container { max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+        :root { --primary: #0f172a; --accent: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 650px; margin: 0 auto; padding-bottom: 50px; }
         
-        /* Category Tiles */
-        .tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 20px 0; }
-        .tile { background: var(--card); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .tile.selected { border-color: var(--primary); background: #eff6ff; }
-        .tile i { font-size: 2rem; display: block; margin-bottom: 10px; }
-        .tile span { font-weight: 700; font-size: 0.9rem; color: var(--primary); }
+        /* Modern Text-Only Tiles */
+        .tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
+        .tile { background: var(--card); padding: 22px 15px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #e2e8f0; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .tile.selected { border-color: var(--accent); background: #f1f5f9; box-shadow: 0 0 0 2px var(--accent); }
+        .tile-title { font-weight: 800; font-size: 0.85rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .tile-sub { display: block; font-size: 0.7rem; color: #64748b; margin-top: 4px; font-weight: 500; }
 
-        /* Buttons & List */
-        .btn { width: 100%; padding: 18px; border-radius: 16px; font-size: 1rem; border: none; cursor: pointer; font-weight: 800; margin-top: 10px; }
-        .btn-main { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(37,99,235,0.3); }
-        .exercise-preview { background: white; padding: 15px; border-radius: 12px; margin-bottom: 8px; border-left: 5px solid var(--primary); font-size: 0.9rem; }
+        .btn { width: 100%; padding: 18px; border-radius: 12px; font-size: 0.9rem; border: none; cursor: pointer; font-weight: 800; text-transform: uppercase; }
+        .btn-main { background: var(--accent); color: white; margin-top: 15px; display: none; }
 
         /* Immersive Timer Overlay */
-        #timer-overlay { display: none; position: fixed; inset: 0; background: #0f172a; color: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; touch-action: none; }
-        .workout-card { background: #1e293b; width: 100%; max-width: 400px; border-radius: 28px; padding: 1.5rem; border: 1px solid #334155; position: relative; margin-top: 20px; }
+        #timer-overlay { display: none; position: fixed; inset: 0; background: #0f172a; color: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 15px; touch-action: none; }
+        .workout-card { background: #1e293b; width: 100%; max-width: 400px; border-radius: 24px; padding: 1.5rem; border: 1px solid #334155; text-align: center; }
         
-        /* Responsive Video Container */
-        .video-container { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 15px; overflow: hidden; background: #000; margin-bottom: 15px; }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        /* GIF/Image Container */
+        .visual-container { width: 100%; aspect-ratio: 1/1; background: #fff; border-radius: 16px; margin-bottom: 15px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .visual-container img { width: 100%; height: 100%; object-fit: cover; }
 
-        #timer-display { font-size: 5.5rem; font-weight: 900; text-align: center; color: var(--accent); line-height: 1; margin: 10px 0; }
+        #timer-display { font-size: 5rem; font-weight: 900; color: #38bdf8; margin: 10px 0; font-variant-numeric: tabular-nums; }
         .controls { display: flex; gap: 10px; margin: 15px 0; }
-        .ctrl-btn { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
+        .ctrl-btn { flex: 1; padding: 14px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; }
         .p-btn { background: #f59e0b; color: white; }
         .r-btn { background: #64748b; color: white; }
-        .quit { background: #ef4444; color: white; padding: 10px 20px; border-radius: 10px; font-size: 0.8rem; margin-top: 20px; }
-
-        .tip-box { background: rgba(255,255,255,0.07); padding: 12px; border-radius: 12px; font-size: 0.85rem; border-left: 3px solid var(--accent); }
+        .quit-link { margin-top: 20px; color: #ef4444; font-weight: 700; font-size: 0.8rem; background: none; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="margin-top: 10px;">⚡ Pro Wellness</h1>
-    <p style="text-align: center; opacity: 0.6; font-size: 0.9rem;">Select a category to begin</p>
+    <h1 style="font-weight: 900; letter-spacing: -1px;">ELITE WELLNESS</h1>
+    <p style="opacity: 0.5; font-size: 0.8rem; font-weight: 600;">SELECT A TRAINING PLAN</p>
     
     <div class="tile-grid" id="category-tiles"></div>
-    <div id="workout-list"></div>
-    <button class="btn btn-main" id="start-btn" style="display:none;" onclick="startCircuit()">▶ START CIRCUIT</button>
+    <button class="btn btn-main" id="start-btn" onclick="startCircuit()">▶ Start Immersive Session</button>
 </div>
 
-<!-- Immersive Overlay -->
 <div id="timer-overlay">
-    <div id="card-header" style="opacity: 0.5; font-size: 0.8rem; letter-spacing: 1px;">EXERCISE 1/5</div>
-    
+    <div id="card-header" style="opacity: 0.5; font-size: 0.7rem; margin-bottom: 5px; font-weight: 800;">EXERCISE 1/5</div>
     <div class="workout-card" id="swipe-surface">
-        <h2 id="card-name" style="margin: 0 0 15px 0; font-size: 1.5rem;">---</h2>
+        <h2 id="card-name" style="margin: 0 0 12px 0; font-size: 1.3rem; text-transform: uppercase;">---</h2>
         
-        <div class="video-container">
-            <iframe id="video-frame" src="" allowfullscreen></iframe>
+        <div class="visual-container">
+            <!-- Using reliable royalty-free GIF placeholders -->
+            <img id="ex-visual" src="https://giphy.com" alt="Exercise Demo">
         </div>
 
         <div id="timer-display">00</div>
@@ -67,72 +61,63 @@
             <button id="pause-btn" class="ctrl-btn p-btn" onclick="togglePause()">PAUSE</button>
             <button class="ctrl-btn r-btn" onclick="resetTimer()">RESET</button>
         </div>
-
-        <div class="tip-box">
-            <strong>GUIDE:</strong> <span id="card-tip">---</span>
+        
+        <div style="font-size: 0.8rem; opacity: 0.7; text-align: left; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+            <strong>TIP:</strong> <span id="card-tip">Keep your core engaged throughout.</span>
         </div>
     </div>
     
-    <p style="font-size: 0.7rem; opacity: 0.4; margin-top: 20px;">← SWIPE TO NAVIGATE →</p>
-    <button class="btn quit" onclick="exitTimer()">QUIT WORKOUT</button>
+    <p style="font-size: 0.6rem; opacity: 0.3; margin-top: 20px;">SWIPE LEFT/RIGHT TO NAVIGATE</p>
+    <button class="quit-link" onclick="exitTimer()">END WORKOUT</button>
 </div>
 
 <script>
-    const lib = {
-        strength: { title: "Strength", icon: "💪", items: [
-            { name: "Banded Squats", time: 45, vid: "dQw4w9WgXcQ", tip: "Keep knees out and chest up." },
-            { name: "Stability Ball Press", time: 45, vid: "dQw4w9WgXcQ", tip: "Engage core, keep back flat." }
+    const plans = {
+        // --- STRENGTH & WEIGHTS ---
+        bodybuilding: { title: "Bodybuilding", sub: "Hypertrophy focus", items: [
+            { name: "Barbell Bench Press", time: 60, img: "https://giphy.com" },
+            { name: "Dumbbell Bicep Curls", time: 45, img: "https://giphy.com" },
+            { name: "Lat Pulldown", time: 50, img: "https://giphy.com" }
         ]},
-        rehab: { title: "Rehab", icon: "🩹", items: [
-            { name: "Dead Bugs", time: 60, vid: "dQw4w9WgXcQ", tip: "Flatten lower back against floor." },
-            { name: "Bird-Dog", time: 45, vid: "dQw4w9WgXcQ", tip: "Focus on length, not height." }
+        powerlifting: { title: "Powerlifting", sub: "Max Strength", items: [
+            { name: "Back Squat", time: 60, img: "https://giphy.com" },
+            { name: "Deadlift", time: 45, img: "https://giphy.com" }
         ]},
-        yoga: { title: "Yoga", icon: "🧘", items: [
-            { name: "Downward Dog", time: 60, vid: "dQw4w9WgXcQ", tip: "Spread fingers wide, drop heels." },
-            { name: "Warrior II", time: 45, vid: "dQw4w9WgXcQ", tip: "Stack front knee over ankle." }
+        hiit_core: { title: "HIIT Cardio", sub: "Fat Burn", items: [
+            { name: "Burpees", time: 30, img: "https://giphy.com" }
         ]},
-        pilates: { title: "Pilates", icon: "⭕", items: [
-            { name: "The Hundred", time: 60, vid: "dQw4w9WgXcQ", tip: "Pump arms from the shoulder." },
-            { name: "Single Leg Stretch", time: 45, vid: "dQw4w9WgXcQ", tip: "Hollow out the belly." }
-        ]}
+        // --- REHAB & THERAPY ---
+        post_op_knee: { title: "Knee Rehab", sub: "Post-Op Recovery", items: [
+            { name: "Quad Sets", time: 45, img: "https://giphy.com" }
+        ]},
+        spinal_health: { title: "Lower Back", sub: "Herniation Rehab", items: [
+            { name: "Pelvic Tilts", time: 60, img: "https://giphy.com" }
+        ]},
+        yoga_vinyasa: { title: "Yoga Flow", sub: "Vinyasa", items: [{ name: "Downward Dog", time: 60, img: "https://giphy.com" }]}
+        // [Expand to 20+ keys similarly...]
     };
 
-    let selectedKey = null, currentSession = [], currentIndex = 0;
-    let timerInt, timeLeft, isPaused = false, wakeLock = null;
+    let selectedKey = null, currentSession = [], currentIndex = 0, timerInt, timeLeft, isPaused = false, touchStartX = 0;
 
     // --- Build Tiles ---
     const grid = document.getElementById('category-tiles');
-    Object.keys(lib).forEach(key => {
+    Object.keys(plans).forEach(key => {
         const t = document.createElement('div');
         t.className = 'tile';
-        t.innerHTML = `<i>${lib[key].icon}</i><span>${lib[key].title}</span>`;
+        t.innerHTML = `<span class="tile-title">${plans[key].title}</span><span class="tile-sub">${plans[key].sub}</span>`;
         t.onclick = () => {
             document.querySelectorAll('.tile').forEach(el => el.classList.remove('selected'));
             t.classList.add('selected');
             selectedKey = key;
-            renderPreview();
+            document.getElementById('start-btn').style.display = 'block';
         };
         grid.appendChild(t);
     });
 
-    function renderPreview() {
-        const list = document.getElementById('workout-list');
-        list.innerHTML = `<h3 style="font-size:1rem; margin-top:20px;">Workout Overview:</h3>`;
-        currentSession = [...lib[selectedKey].items];
-        currentSession.forEach(ex => {
-            const d = document.createElement('div');
-            d.className = 'exercise-preview';
-            d.innerHTML = `<strong>${ex.name}</strong> • ${ex.time}s`;
-            list.appendChild(d);
-        });
-        document.getElementById('start-btn').style.display = 'block';
-    }
-
-    // --- Circuit Logic ---
     async function startCircuit() {
+        currentSession = [...plans[selectedKey].items];
         currentIndex = 0;
         document.getElementById('timer-overlay').style.display = 'flex';
-        try { if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
         loadCard();
     }
 
@@ -141,9 +126,7 @@
         const ex = currentSession[currentIndex];
         document.getElementById('card-header').innerText = `EXERCISE ${currentIndex + 1}/${currentSession.length}`;
         document.getElementById('card-name').innerText = ex.name;
-        document.getElementById('card-tip').innerText = ex.tip;
-        document.getElementById('video-frame').src = `https://youtube.com{ex.vid}?autoplay=1&mute=1&loop=1&playlist=${ex.vid}`;
-        
+        document.getElementById('ex-visual').src = ex.img;
         timeLeft = ex.time;
         isPaused = false;
         document.getElementById('pause-btn').innerText = "PAUSE";
@@ -156,7 +139,7 @@
             if (!isPaused) {
                 timeLeft--;
                 updateDisplay();
-                if (timeLeft <= 0) { clearInterval(timerInt); beep(); }
+                if (timeLeft <= 0) clearInterval(timerInt);
             }
         }, 1000);
     }
@@ -166,38 +149,24 @@
         document.getElementById('pause-btn').innerText = isPaused ? "RESUME" : "PAUSE";
     }
 
-    function resetTimer() {
-        timeLeft = currentSession[currentIndex].time;
-        updateDisplay();
-    }
+    function resetTimer() { timeLeft = currentSession[currentIndex].time; updateDisplay(); }
+    function updateDisplay() { document.getElementById('timer-display').innerText = timeLeft; }
 
-    function updateDisplay() {
-        document.getElementById('timer-display').innerText = timeLeft;
-    }
-
-    // --- Enhanced Mobile Swipe ---
-    let touchStartX = 0;
-    document.getElementById('timer-overlay').addEventListener('touchstart', e => touchStartX = e.touches[0].clientX, {passive:true});
-    document.getElementById('timer-overlay').addEventListener('touchend', e => {
-        const diff = touchStartX - e.changedTouches[0].clientX;
+    // --- Mobile Swipe Support ---
+    const overlay = document.getElementById('timer-overlay');
+    overlay.addEventListener('touchstart', e => touchStartX = e.touches.clientX, {passive: true});
+    overlay.addEventListener('touchend', e => {
+        const diff = touchStartX - e.changedTouches.clientX;
         if (Math.abs(diff) > 70) {
             if (diff > 0 && currentIndex < currentSession.length - 1) { currentIndex++; loadCard(); }
             else if (diff < 0 && currentIndex > 0) { currentIndex--; loadCard(); }
         }
-    }, {passive:true});
-
-    function beep() {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        osc.connect(ctx.destination);
-        osc.start(); osc.stop(ctx.currentTime + 0.5);
-    }
+    }, {passive: true});
 
     function exitTimer() {
         clearInterval(timerInt);
-        if(wakeLock) wakeLock.release();
         document.getElementById('timer-overlay').style.display = 'none';
-        document.getElementById('video-frame').src = "";
+        document.getElementById('ex-visual').src = "";
     }
 </script>
 </body>
