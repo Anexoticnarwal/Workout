@@ -3,129 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elite Wellness Suite Pro</title>
+    <title>Elite Hub Pro</title>
     <style>
         :root { --primary: #0f172a; --accent: #2563eb; --bg: #f8fafc; --text: #1e293b; --card: #ffffff; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); touch-action: manipulation; }
+        .container { max-width: 600px; margin: 0 auto; padding-bottom: 60px; }
         
+        /* Dashboard Grid */
         .tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
-        .tile { background: var(--card); padding: 18px 10px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #e2e8f0; }
-        .tile.selected { border-color: var(--accent); background: #eff6ff; box-shadow: 0 0 0 2px var(--accent); }
-        .tile-title { font-weight: 800; font-size: 0.75rem; text-transform: uppercase; color: var(--primary); }
+        .tile { background: var(--card); padding: 20px 10px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #e2e8f0; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; }
+        .tile.selected { border-color: var(--accent); background: #eff6ff; }
 
-        #selection-zone { display: none; margin-top: 25px; animation: fadeIn 0.3s ease; }
-        .ex-row { background: white; padding: 14px; border-radius: 10px; margin-bottom: 8px; display: flex; align-items: center; border: 1px solid #e2e8f0; font-size: 0.9rem; }
-        .ex-row input { width: 22px; height: 22px; margin-right: 15px; accent-color: var(--accent); }
-        
-        .btn { width: 100%; padding: 18px; border-radius: 14px; font-size: 1rem; border: none; cursor: pointer; font-weight: 800; text-transform: uppercase; margin-top: 15px; }
-        .btn-main { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(37,99,235,0.3); }
+        /* Selection & Drag/Drop */
+        #selection-zone { display: none; margin-top: 20px; }
+        .ex-list-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; align-items: center; border: 1px solid #e2e8f0; cursor: grab; }
+        .ex-list-item.dragging { opacity: 0.5; background: #f1f5f9; }
+        .drag-handle { margin-right: 15px; color: #cbd5e1; font-size: 1.2rem; cursor: grab; }
+        .ex-checkbox { width: 20px; height: 20px; margin-right: 12px; }
 
+        /* Immersive Timer Overlay */
         #timer-overlay { display: none; position: fixed; inset: 0; background: #0f172a; color: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; touch-action: none; }
-        .workout-card { background: #1e293b; width: 100%; max-width: 400px; border-radius: 28px; padding: 2rem; border: 1px solid #334155; text-align: center; }
-        #timer-display { font-size: 6rem; font-weight: 900; color: #38bdf8; margin: 15px 0; line-height: 1; }
-        .controls { display: flex; gap: 10px; margin: 20px 0; }
-        .ctrl-btn { flex: 1; padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; color: white; }
-        .p-btn { background: #f59e0b; }
-        .r-btn { background: #64748b; }
+        .workout-card { background: #1e293b; width: 100%; max-width: 400px; border-radius: 28px; padding: 1.5rem; border: 1px solid #334155; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        #timer-display { font-size: 6rem; font-weight: 900; color: #38bdf8; margin: 10px 0; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Form Instructions Modal */
+        .how-to-box { display: none; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; margin-top: 15px; font-size: 0.85rem; text-align: left; border-left: 4px solid var(--accent); line-height: 1.4; }
+        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn-main { background: var(--accent); color: white; }
+        .btn-info { background: #334155; color: #94a3b8; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="font-weight: 900; letter-spacing: -1.5px; margin-bottom: 5px;">ELITE HUB</h1>
-    <p style="opacity: 0.5; font-size: 0.8rem; font-weight: 700; margin-bottom: 20px;">300+ EXERCISES • 20 SPECIALIZED PLANS</p>
-    
+    <h1 style="font-weight: 900; letter-spacing: -1px;">ELITE HUB PRO</h1>
     <div class="tile-grid" id="category-tiles"></div>
 
     <div id="selection-zone">
-        <h3 id="zone-title" style="font-size: 0.85rem; color: #64748b; text-transform: uppercase; margin-bottom: 15px;">Build Your Session:</h3>
+        <h3 style="font-size: 0.8rem; color: #64748b; margin-bottom: 10px;">SELECT & DRAG TO REORDER:</h3>
         <div id="exercise-options"></div>
-        <button class="btn btn-main" onclick="startCircuit()">▶ Start Immersive Workout</button>
+        <button class="btn btn-main" onclick="startCircuit()">▶ START WORKOUT</button>
     </div>
 </div>
 
 <div id="timer-overlay">
     <div class="workout-card" id="swipe-surface">
-        <div id="card-header" style="opacity: 0.5; font-size: 0.75rem; font-weight: 800; margin-bottom: 10px;">EXERCISE 1/15</div>
-        <h2 id="card-name" style="margin: 0; text-transform: uppercase; font-size: 1.5rem; letter-spacing: 0.5px;">---</h2>
+        <div id="card-header" style="opacity: 0.5; font-size: 0.7rem; font-weight: 800;">EXERCISE 1/5</div>
+        <h2 id="card-name" style="margin: 10px 0; text-transform: uppercase; font-size: 1.4rem;">---</h2>
         
         <div id="timer-display">00</div>
         
-        <div class="controls">
-            <button id="pause-btn" class="ctrl-btn p-btn" onclick="togglePause()">PAUSE</button>
-            <button class="ctrl-btn r-btn" onclick="resetTimer()">RESET</button>
+        <div style="display: flex; gap: 8px;">
+            <button id="pause-btn" class="btn btn-main" style="background:#f59e0b" onclick="togglePause()">PAUSE</button>
+            <button class="btn btn-main" style="background:#64748b" onclick="resetTimer()">RESET</button>
         </div>
 
-        <div style="font-size: 0.85rem; opacity: 0.8; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border-left: 4px solid var(--accent); text-align: left;">
-            <strong>PRO TIP:</strong> Keep movements rhythmic and maintain full focus on the targeted muscle.
-        </div>
+        <button class="btn btn-info" onclick="toggleHowTo()">How to do this? ⓘ</button>
+        <div id="how-to-content" class="how-to-box"></div>
     </div>
-    <p style="font-size: 0.65rem; opacity: 0.4; margin-top: 30px; font-weight: 600;">SWIPE LEFT OR RIGHT TO NAVIGATE</p>
-    <button style="margin-top: 25px; background: none; border: none; color: #ef4444; font-weight: 900; cursor: pointer; font-size: 0.85rem;" onclick="exitTimer()">END WORKOUT</button>
+    <p style="font-size: 0.65rem; opacity: 0.4; margin-top: 30px;">← SWIPE TO NAVIGATE →</p>
+    <button style="margin-top: 20px; background:none; border:none; color:#ef4444; font-weight:900;" onclick="exitTimer()">END SESSION</button>
 </div>
 
 <script>
     const plans = {
-        "Bodybuilding (Upper)": ["Bench Press", "Incline DB Press", "Chest Flyes", "Pushups", "Dips", "Lat Pulldowns", "Bent Over Rows", "Seated Cable Rows", "Pull Ups", "Face Pulls", "Military Press", "Lateral Raises", "Front Raises", "Bicep Curls", "Tricep Extensions"],
-        "Bodybuilding (Lower)": ["Back Squats", "Leg Press", "Leg Extensions", "Leg Curls", "Goblet Squats", "Walking Lunges", "Bulgarian Split Squats", "Romanian Deadlift", "Calf Raises", "Seated Calf Raises", "Hip Thrusts", "Glute Kickbacks", "Adductor Machine", "Abductor Machine", "Step Ups"],
-        "Powerlifting": ["Competition Squat", "Paused Squat", "Tempo Squat", "Competition Bench", "Paused Bench", "Close Grip Bench", "Spoto Press", "Conventional Deadlift", "Sumo Deadlift", "Deficit Deadlift", "Block Pulls", "Rack Pulls", "Overhead Press", "Barbell Rows", "Good Mornings"],
-        "HIIT Cardio": ["Burpees", "Mountain Climbers", "Jumping Jacks", "High Knees", "Butt Kicks", "Skaters", "Plank Jacks", "Box Jumps", "Battle Ropes", "Kettlebell Swings", "Sprints", "Jump Rope", "Bear Crawls", "Frog Jumps", "Star Jumps"],
-        "Knee Rehab": ["Quad Sets", "Straight Leg Raises", "Short Arc Quads", "Long Arc Quads", "Heel Slides", "Wall Slides", "Clamshells", "Glute Bridges", "Terminal Knee Extension", "Step Downs", "Single Leg Balance", "Hamstring Curls (Bands)", "Calf Stretches", "IT Band Foam Roll", "VMO Activations"],
-        "Shoulder Rehab": ["Pendulums", "Wall Crawls", "Internal Rotation (Band)", "External Rotation (Band)", "Scapular Squeezes", "Doorway Stretch", "Prone Y-Raises", "Prone T-Raises", "Sleeper Stretch", "Blackburns", "Serratus Punches", "Face Pulls (Light)", "Resistance Band Pull-Aparts", "Isometric Holds", "Cross-Body Stretch"],
-        "Spinal Health": ["Pelvic Tilts", "Cat-Cow", "Bird-Dog", "Dead Bug", "Child's Pose", "Knee to Chest", "Piriformis Stretch", "Sphinx Pose", "Superman", "Bridge Holds", "Plank (Modified)", "Side Plank", "Thoracic Rotations", "Hamstring Stretch", "Pigeon Stretch"],
-        "Yoga (Flow)": ["Mountain Pose", "Forward Fold", "Halfway Lift", "Plank", "Chaturanga", "Upward Dog", "Downward Dog", "Warrior I", "Warrior II", "Reverse Warrior", "Triangle Pose", "Humble Warrior", "Crescent Lunge", "Chair Pose", "Tree Pose"],
-        "Yoga (Restorative)": ["Supported Bridge", "Legs Up Wall", "Reclined Butterfly", "Bolster Savasana", "Supported Fish", "Caterpillar Pose", "Happy Baby", "Deer Pose", "Melting Heart", "Sleeping Swan", "Sphinx with Bolster", "Supported Twisted Root", "Banana-asana", "Supta Virasana", "Corpse Pose"],
-        "Pilates (Mat)": ["The Hundred", "Roll Up", "Single Leg Circles", "Rolling Like a Ball", "Single Leg Stretch", "Double Leg Stretch", "Scissors", "Lower and Lift", "Criss Cross", "Spine Stretch Forward", "Open Leg Rocker", "Corkscrew", "The Saw", "Swan Dive", "Single Leg Kick"],
-        "Pilates (Advanced)": ["Teaser I", "Teaser II", "Teaser III", "Boomerang", "Seal", "Crab", "Rocking", "Control Balance", "Jack Knife", "The Side Kick", "Hip Twist", "Leg Pull Front", "Leg Pull Back", "Side Kick Kneeling", "The Mermaid"],
-        "Mobility": ["World's Greatest Stretch", "90/90 Hips", "Deep Squat Hold", "Cosack Squats", "Ankle Circles", "Wrist Carpals", "Shoulder Dislocates", "Scapular Car's", "Neck Tilts", "Spinal Waves", "Lunge with Rotation", "Frog Stretch", "Thread the Needle", "Puppy Pose", "Wrist Extensions"],
-        "Calisthenics": ["Pull Ups", "Chin Ups", "Push Ups", "Diamond Push Ups", "Wide Push Ups", "Pseudo Planche Pushups", "Dips", "Muscle Ups", "L-Sit", "Handstand Kickups", "Handstand Wall Walks", "Hanging Leg Raises", "Tuck Front Lever", "Negative Pullups", "Bodyweight Rows"],
-        "Functional Fitness": ["Farmer Carries", "Goblet Squats", "Single Arm DB Row", "Plank", "Turkish Get-Ups", "Sandbag Cleans", "Medicine Ball Slams", "Wall Balls", "Bear Crawls", "Walking Lunges", "Box Step Ups", "Dead hangs", "Push Press", "Thrusters", "Assault Bike Sprints"],
-        "Senior Wellness": ["Chair Squats", "Wall Pushups", "Seated Leg Extensions", "Standing Calf Raises", "Seated Bicep Curls", "Seated Overhead Press", "Tandem Stance", "Single Leg Stand", "Heel-to-Toe Walk", "Shoulder Shrugs", "Neck Rotations", "Ankle Pumps", "Seated Cat-Cow", "Side Bends", "Wrist Curls"],
-        "Runner's Prep": ["A-Skips", "B-Skips", "C-Skips", "High Knees", "Butt Kicks", "Walking Lunges", "Single Leg RDL", "Calf Raises", "Glute Bridges", "Clamshells", "Monster Walks", "Lateral Band Walks", "Plank", "Side Plank", "Tibialis Raises"],
-        "Office Ergonomics": ["Neck Stretch", "Shoulder Rolls", "Chest Opener", "Wrist Stretch", "Forearm Stretch", "Seated Spinal Twist", "Eagle Arms", "Seated Figure Four", "Standing Forward Fold", "Cat-Cow in Chair", "Tricep Stretch", "Hamstring Stretch (Seated)", "Eye Palming", "Ankle Circles", "Standing Quad Stretch"],
-        "Explosiveness": ["Broad Jumps", "Vertical Jumps", "Medicine Ball Throws", "Depth Jumps", "Box Jumps", "Power Cleans", "Snatch Pulls", "Plyo Pushups", "Single Leg Bounds", "Tuck Jumps", "Speed Skaters", "Band Resisted Sprints", "Reactive Starts", "Kneeling Jump to Feet", "Hurdle Hops"],
-        "Post-Pregnancy": ["Pelvic Floor Flex", "Diaphragmatic Breathing", "TA Activation", "Heel Slides", "Toe Taps", "Side Lying Clams", "Modified Side Plank", "Glute Bridges", "Cat-Cow", "Child's Pose", "Tail Wag", "Bird-Dog (Bird only)", "Wall Sits", "Seated Marches", "Supine Pelvic Tilts"],
-        "Martial Arts": ["Shadow Boxing", "Sprawls", "Thai Roundhouse", "Front Kicks", "Snap Kicks", "Hip Escapes", "Bridge and Roll", "Triangle Drills", "Plank Holds", "Knuckle Pushups", "Medicine Ball Situps", "Neck Strengthening", "Wrist Mobility", "Bear Crawls", "Jump Rope"]
+        "Bodybuilding": [
+            { name: "Bench Press", info: "1. Lie flat. 2. Grip bar slightly wider than shoulders. 3. Lower to chest. 4. Press up." },
+            { name: "Back Squat", info: "1. Bar on upper back. 2. Feet shoulder width. 3. Sit back until thighs are parallel. 4. Drive up." },
+            { name: "Deadlift", info: "1. Feet hip width. 2. Grip bar outside legs. 3. Keep back flat. 4. Stand up, pulling bar close to shins." }
+        ],
+        "Knee Rehab": [
+            { name: "Quad Sets", info: "1. Sit with leg straight. 2. Tighten thigh muscle. 3. Push back of knee into floor. 4. Hold 5s." },
+            { name: "Straight Leg Raise", info: "1. Lie on back. 2. One knee bent, other straight. 3. Lift straight leg 12 inches. 4. Lower slowly." }
+        ],
+        "Yoga Flow": [
+            { name: "Downward Dog", info: "1. Start on hands and knees. 2. Lift hips toward ceiling. 3. Push through palms. 4. Reach heels to floor." }
+        ]
+        // Add more plans following this structure...
     };
 
-    let selectedKey = null, currentSession = [], currentIndex = 0, timerInt, timeLeft, isPaused = false, touchStartX = 0;
+    let selectedKey = null, currentSession = [], currentIndex = 0, timerInt, timeLeft, isPaused = false;
+    let touchStartX = 0, touchStartY = 0;
 
+    // Build Category Tiles
     const grid = document.getElementById('category-tiles');
     Object.keys(plans).forEach(key => {
         const t = document.createElement('div');
         t.className = 'tile';
-        t.innerHTML = `<span class="tile-title">${key}</span>`;
+        t.innerText = key;
         t.onclick = () => {
             document.querySelectorAll('.tile').forEach(el => el.classList.remove('selected'));
             t.classList.add('selected');
             selectedKey = key;
-            showOptions(key);
+            renderSelection(key);
         };
         grid.appendChild(t);
     });
 
-    function showOptions(key) {
-        const zone = document.getElementById('selection-zone');
+    function renderSelection(key) {
         const list = document.getElementById('exercise-options');
-        document.getElementById('zone-title').innerText = `${key}: Select Exercises`;
-        zone.style.display = 'block';
-        list.innerHTML = plans[key].map((name, i) => `
-            <div class="ex-row">
-                <input type="checkbox" checked id="ex-${i}" value="${name}">
-                <label for="ex-${i}"><strong>${name}</strong></label>
+        document.getElementById('selection-zone').style.display = 'block';
+        list.innerHTML = plans[key].map((ex, i) => `
+            <div class="ex-list-item" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)">
+                <span class="drag-handle">⠿</span>
+                <input type="checkbox" class="ex-checkbox" checked value="${i}">
+                <span style="font-weight:700">${ex.name}</span>
             </div>
         `).join('');
-        zone.scrollIntoView({ behavior: 'smooth' });
     }
 
-    async function startCircuit() {
-        const checks = document.querySelectorAll('#exercise-options input:checked');
-        currentSession = Array.from(checks).map(c => ({ name: c.value, time: 60 }));
+    // Drag and Drop Logic
+    function handleDragStart(e) { e.target.classList.add('dragging'); }
+    function handleDragOver(e) {
+        e.preventDefault();
+        const list = document.getElementById('exercise-options');
+        const dragging = document.querySelector('.dragging');
+        const sibling = Array.from(list.children).find(child => e.clientY <= child.offsetTop + child.offsetHeight / 2);
+        list.insertBefore(dragging, sibling);
+    }
+    document.addEventListener('dragend', (e) => e.target.classList.remove('dragging'));
+
+    function startCircuit() {
+        const items = document.querySelectorAll('.ex-list-item');
+        currentSession = Array.from(items).filter(item => item.querySelector('input').checked)
+                                         .map(item => plans[selectedKey][item.querySelector('input').value]);
         if (!currentSession.length) return alert("Select at least one exercise!");
-        
         currentIndex = 0;
         document.getElementById('timer-overlay').style.display = 'flex';
         loadCard();
@@ -136,37 +138,36 @@
         const ex = currentSession[currentIndex];
         document.getElementById('card-header').innerText = `EXERCISE ${currentIndex + 1}/${currentSession.length}`;
         document.getElementById('card-name').innerText = ex.name;
-        timeLeft = ex.time;
-        isPaused = false;
+        document.getElementById('how-to-content').innerText = ex.info;
+        document.getElementById('how-to-content').style.display = 'none';
+        timeLeft = 60; isPaused = false;
         document.getElementById('pause-btn').innerText = "PAUSE";
         updateDisplay();
         startTimer();
     }
 
-    function startTimer() {
-        timerInt = setInterval(() => {
-            if (!isPaused) {
-                timeLeft--;
-                updateDisplay();
-                if (timeLeft <= 0) clearInterval(timerInt);
-            }
-        }, 1000);
+    // SWIPE ENGINE
+    const overlay = document.getElementById('timer-overlay');
+    overlay.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: false});
+    overlay.addEventListener('touchmove', e => e.preventDefault(), {passive: false}); // Stop page scroll
+    overlay.addEventListener('touchend', e => {
+        const diffX = touchStartX - e.changedTouches[0].clientX;
+        const diffY = touchStartY - e.changedTouches[0].clientY;
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
+            if (diffX > 0 && currentIndex < currentSession.length - 1) { currentIndex++; loadCard(); }
+            else if (diffX < 0 && currentIndex > 0) { currentIndex--; loadCard(); }
+        }
+    });
+
+    function toggleHowTo() {
+        const box = document.getElementById('how-to-content');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
     }
 
+    function startTimer() { timerInt = setInterval(() => { if(!isPaused) { timeLeft--; updateDisplay(); if(timeLeft <= 0) clearInterval(timerInt); } }, 1000); }
     function togglePause() { isPaused = !isPaused; document.getElementById('pause-btn').innerText = isPaused ? "RESUME" : "PAUSE"; }
     function resetTimer() { timeLeft = 60; updateDisplay(); }
     function updateDisplay() { document.getElementById('timer-display').innerText = timeLeft; }
-
-    const overlay = document.getElementById('timer-overlay');
-    overlay.addEventListener('touchstart', e => touchStartX = e.touches.clientX, {passive: true});
-    overlay.addEventListener('touchend', e => {
-        const diff = touchStartX - e.changedTouches.clientX;
-        if (Math.abs(diff) > 70) {
-            if (diff > 0 && currentIndex < currentSession.length - 1) { currentIndex++; loadCard(); }
-            else if (diff < 0 && currentIndex > 0) { currentIndex--; loadCard(); }
-        }
-    }, {passive: true});
-
     function exitTimer() { clearInterval(timerInt); document.getElementById('timer-overlay').style.display = 'none'; }
 </script>
 </body>
