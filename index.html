@@ -1,143 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pro Fitness & Wellness Suite</title>
+    <title>Pro Wellness Suite</title>
     <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --accent: #38bdf8; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); }
-        .container { max-width: 500px; margin: 0 auto; background: var(--card); padding: 1.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        h1 { font-size: 1.6rem; text-align: center; color: var(--primary); margin-bottom: 20px; }
-        label { font-weight: 600; font-size: 0.9rem; color: #64748b; display: block; margin-bottom: 5px; }
-        select, .btn { width: 100%; padding: 16px; margin: 8px 0; border-radius: 14px; font-size: 1rem; border: none; cursor: pointer; transition: 0.2s; }
-        select { border: 2px solid #e2e8f0; background: white; appearance: none; }
-        .btn-main { background: var(--primary); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-main:active { transform: scale(0.98); }
-        .btn-secondary { background: #1e293b; color: white; }
-        .exercise-item { background: #f1f5f9; padding: 14px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid var(--primary); }
-        #timer-overlay { display: none; position: fixed; inset: 0; background: #0f172a; color: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .workout-card { background: #1e293b; width: 85%; max-width: 380px; border-radius: 30px; padding: 2.5rem; border: 1px solid #334155; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        #progress-container { width: 100%; height: 8px; background: #334155; border-radius: 10px; margin: 25px 0; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: var(--accent); transition: 0.2s linear; }
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
-        .detail-box { background: #334155; padding: 12px; border-radius: 12px; font-size: 0.85rem; }
-        #history-list { margin-top: 15px; max-height: 150px; overflow-y: auto; }
-        .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); overflow-x: hidden; }
+        .container { max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+        
+        /* Category Tiles */
+        .tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 20px 0; }
+        .tile { background: var(--card); padding: 20px; border-radius: 20px; text-align: center; cursor: pointer; border: 2px solid transparent; transition: 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .tile.selected { border-color: var(--primary); background: #eff6ff; }
+        .tile i { font-size: 2rem; display: block; margin-bottom: 10px; }
+        .tile span { font-weight: 700; font-size: 0.9rem; color: var(--primary); }
+
+        /* Buttons & List */
+        .btn { width: 100%; padding: 18px; border-radius: 16px; font-size: 1rem; border: none; cursor: pointer; font-weight: 800; margin-top: 10px; }
+        .btn-main { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(37,99,235,0.3); }
+        .exercise-preview { background: white; padding: 15px; border-radius: 12px; margin-bottom: 8px; border-left: 5px solid var(--primary); font-size: 0.9rem; }
+
+        /* Immersive Timer Overlay */
+        #timer-overlay { display: none; position: fixed; inset: 0; background: #0f172a; color: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; touch-action: none; }
+        .workout-card { background: #1e293b; width: 100%; max-width: 400px; border-radius: 28px; padding: 1.5rem; border: 1px solid #334155; position: relative; margin-top: 20px; }
+        
+        /* Responsive Video Container */
+        .video-container { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 15px; overflow: hidden; background: #000; margin-bottom: 15px; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        #timer-display { font-size: 5.5rem; font-weight: 900; text-align: center; color: var(--accent); line-height: 1; margin: 10px 0; }
+        .controls { display: flex; gap: 10px; margin: 15px 0; }
+        .ctrl-btn { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
+        .p-btn { background: #f59e0b; color: white; }
+        .r-btn { background: #64748b; color: white; }
+        .quit { background: #ef4444; color: white; padding: 10px 20px; border-radius: 10px; font-size: 0.8rem; margin-top: 20px; }
+
+        .tip-box { background: rgba(255,255,255,0.07); padding: 12px; border-radius: 12px; font-size: 0.85rem; border-left: 3px solid var(--accent); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>⚡ Pro Fitness & Wellness</h1>
+    <h1 style="margin-top: 10px;">⚡ Pro Wellness</h1>
+    <p style="text-align: center; opacity: 0.6; font-size: 0.9rem;">Select a category to begin</p>
     
-    <label>Choose Training Discipline:</label>
-    <select id="mode-select">
-        <optgroup label="Core Fitness">
-            <option value="strength">Full Body Strength</option>
-            <option value="hiit">HIIT & Cardio</option>
-            <option value="mobility">Dynamic Mobility</option>
-        </optgroup>
-        <optgroup label="Rehab & Therapy">
-            <option value="physio">Physio (Back/Knee/Shoulder)</option>
-        </optgroup>
-        <optgroup label="Mind & Body">
-            <option value="yoga_basic">Yoga (Foundational)</option>
-            <option value="yoga_int">Yoga (Intermediate)</option>
-            <option value="pilates_mat">Pilates (Mat Basics)</option>
-            <option value="pilates_adv">Pilates (Advanced Core)</option>
-        </optgroup>
-    </select>
-
-    <button class="btn btn-main" onclick="generateWorkout()">Generate Program</button>
-    <button class="btn btn-secondary" id="start-btn" style="display:none;" onclick="startCircuit()">▶ Start Immersive Circuit</button>
-
+    <div class="tile-grid" id="category-tiles"></div>
     <div id="workout-list"></div>
-
-    <div style="margin-top: 30px;">
-        <h3 style="font-size: 1rem; color: #64748b;">Recent Sessions</h3>
-        <div id="history-list"></div>
-        <button class="btn" style="color: #ef4444; padding: 5px; font-size: 0.8rem; background: none;" onclick="clearHistory()">Clear History</button>
-    </div>
+    <button class="btn btn-main" id="start-btn" style="display:none;" onclick="startCircuit()">▶ START CIRCUIT</button>
 </div>
 
+<!-- Immersive Overlay -->
 <div id="timer-overlay">
-    <div id="timer-label" style="color: var(--accent); font-weight: bold; margin-bottom: 10px;">EXERCISE 1/5</div>
+    <div id="card-header" style="opacity: 0.5; font-size: 0.8rem; letter-spacing: 1px;">EXERCISE 1/5</div>
+    
     <div class="workout-card" id="swipe-surface">
-        <h2 id="card-name" style="margin: 0; font-size: 1.8rem;">---</h2>
-        <div id="timer-display" style="font-size: 6rem; font-weight: 900; margin: 10px 0;">00</div>
-        <div id="progress-container"><div id="progress-bar"></div></div>
-        <div class="detail-grid">
-            <div class="detail-box"><strong>DURATION</strong><br><span id="card-time">--</span>s</div>
-            <div class="detail-box"><strong>SETS</strong><br>3 Active</div>
-            <div class="detail-box" style="grid-column: span 2;"><strong>TARGET / EQUIP</strong><br><span id="card-equip">--</span></div>
+        <h2 id="card-name" style="margin: 0 0 15px 0; font-size: 1.5rem;">---</h2>
+        
+        <div class="video-container">
+            <iframe id="video-frame" src="" allowfullscreen></iframe>
+        </div>
+
+        <div id="timer-display">00</div>
+        
+        <div class="controls">
+            <button id="pause-btn" class="ctrl-btn p-btn" onclick="togglePause()">PAUSE</button>
+            <button class="ctrl-btn r-btn" onclick="resetTimer()">RESET</button>
+        </div>
+
+        <div class="tip-box">
+            <strong>GUIDE:</strong> <span id="card-tip">---</span>
         </div>
     </div>
-    <p style="font-size: 0.75rem; opacity: 0.5; margin-top: 25px;">← SWIPE CARDS TO NAVIGATE →</p>
-    <button class="btn" style="width: 120px; background: #ef4444; margin-top: 15px;" onclick="exitTimer()">QUIT</button>
+    
+    <p style="font-size: 0.7rem; opacity: 0.4; margin-top: 20px;">← SWIPE TO NAVIGATE →</p>
+    <button class="btn quit" onclick="exitTimer()">QUIT WORKOUT</button>
 </div>
 
 <script>
     const lib = {
-        strength: [
-            {name: "Banded Squats", equip: "Legs / Band", time: 45}, {name: "Ball Chest Press", equip: "Chest / Ball", time: 45},
-            {name: "Kettlebell Deadlift", equip: "Glutes / KB", time: 45}, {name: "Dumbbell Row", equip: "Back / DB", time: 40},
-            {name: "Banded Bicep Curls", equip: "Arms / Band", time: 40}, {name: "Stability Ball Pikes", equip: "Core / Ball", time: 30}
-        ],
-        hiit: [
-            {name: "Burpees", equip: "Full Body", time: 30}, {name: "Mountain Climbers", equip: "Cardio", time: 45},
-            {name: "Jump Squats", equip: "Power", time: 30}, {name: "Plank Jacks", equip: "Core/Cardio", time: 40},
-            {name: "High Knees", equip: "Cardio", time: 30}, {name: "Lateral Bounds", equip: "Agility", time: 45}
-        ],
-        mobility: [
-            {name: "90/90 Hip Switches", equip: "Hips", time: 60}, {name: "Cat-Cow Flow", equip: "Spine", time: 45},
-            {name: "Prone Swimmers", equip: "Shoulders", time: 45}, {name: "Inchworms", equip: "Hamstrings", time: 60},
-            {name: "World's Greatest Stretch", equip: "Full Body", time: 60}, {name: "Thoracic Rotations", equip: "Upper Back", time: 45}
-        ],
-        physio: [
-            {name: "Glute Bridges", equip: "Lower Back/Hips", time: 45}, {name: "Dead Bugs", equip: "Core Stability", time: 60},
-            {name: "Banded Clamshells", equip: "Hips / Band", time: 45}, {name: "Scapular Squeezes", equip: "Posture", time: 30},
-            {name: "Bird-Dog", equip: "Spine Stability", time: 45}, {name: "Knee-to-Chest Stretch", equip: "Lower Back", time: 60}
-        ],
-        yoga_basic: [
-            {name: "Mountain Pose (Tadasana)", equip: "Posture", time: 60}, {name: "Downward Dog", equip: "Flexibility", time: 60},
-            {name: "Warrior II", equip: "Strength/Balance", time: 45}, {name: "Tree Pose", equip: "Balance", time: 45},
-            {name: "Child's Pose", equip: "Restorative", time: 60}, {name: "Cobra Pose", equip: "Back Extension", time: 45}
-        ],
-        yoga_int: [
-            {name: "Warrior III", equip: "Advanced Balance", time: 45}, {name: "Crow Pose Prep", equip: "Arm Strength", time: 30},
-            {name: "Triangle Pose", equip: "Side Body", time: 45}, {name: "Plank to Chaturanga", equip: "Flow", time: 40},
-            {name: "Happy Baby", equip: "Deep Hip Opener", time: 60}, {name: "Pigeon Pose", equip: "Glute Stretch", time: 60}
-        ],
-        pilates_mat: [
-            {name: "The Hundred", equip: "Warm-up / Core", time: 60}, {name: "Single Leg Circle", equip: "Hip Mobility", time: 45},
-            {name: "Rolling Like a Ball", equip: "Spine Massage", time: 45}, {name: "Single Leg Stretch", equip: "Abs", time: 45},
-            {name: "Spine Stretch Forward", equip: "Flexibility", time: 60}, {name: "Swan Prep", equip: "Back Strength", time: 45}
-        ],
-        pilates_adv: [
-            {name: "Teaser", equip: "Advanced Core", time: 45}, {name: "The Corkscrew", equip: "Obliques", time: 45},
-            {name: "Leg Pull Front", equip: "Stability", time: 45}, {name: "Side Kick Kneeling", equip: "Glutes/Balance", time: 45},
-            {name: "Boomerang", equip: "Articulation", time: 60}, {name: "Pilates Push-up", equip: "Upper Body", time: 60}
-        ]
+        strength: { title: "Strength", icon: "💪", items: [
+            { name: "Banded Squats", time: 45, vid: "dQw4w9WgXcQ", tip: "Keep knees out and chest up." },
+            { name: "Stability Ball Press", time: 45, vid: "dQw4w9WgXcQ", tip: "Engage core, keep back flat." }
+        ]},
+        rehab: { title: "Rehab", icon: "🩹", items: [
+            { name: "Dead Bugs", time: 60, vid: "dQw4w9WgXcQ", tip: "Flatten lower back against floor." },
+            { name: "Bird-Dog", time: 45, vid: "dQw4w9WgXcQ", tip: "Focus on length, not height." }
+        ]},
+        yoga: { title: "Yoga", icon: "🧘", items: [
+            { name: "Downward Dog", time: 60, vid: "dQw4w9WgXcQ", tip: "Spread fingers wide, drop heels." },
+            { name: "Warrior II", time: 45, vid: "dQw4w9WgXcQ", tip: "Stack front knee over ankle." }
+        ]},
+        pilates: { title: "Pilates", icon: "⭕", items: [
+            { name: "The Hundred", time: 60, vid: "dQw4w9WgXcQ", tip: "Pump arms from the shoulder." },
+            { name: "Single Leg Stretch", time: 45, vid: "dQw4w9WgXcQ", tip: "Hollow out the belly." }
+        ]}
     };
 
-    let currentSession = [], currentIndex = 0, timerInt, wakeLock = null, touchStartX = 0;
+    let selectedKey = null, currentSession = [], currentIndex = 0;
+    let timerInt, timeLeft, isPaused = false, wakeLock = null;
 
-    function generateWorkout() {
-        const mode = document.getElementById('mode-select').value;
+    // --- Build Tiles ---
+    const grid = document.getElementById('category-tiles');
+    Object.keys(lib).forEach(key => {
+        const t = document.createElement('div');
+        t.className = 'tile';
+        t.innerHTML = `<i>${lib[key].icon}</i><span>${lib[key].title}</span>`;
+        t.onclick = () => {
+            document.querySelectorAll('.tile').forEach(el => el.classList.remove('selected'));
+            t.classList.add('selected');
+            selectedKey = key;
+            renderPreview();
+        };
+        grid.appendChild(t);
+    });
+
+    function renderPreview() {
         const list = document.getElementById('workout-list');
-        list.innerHTML = '';
-        currentSession = [...lib[mode]].sort(() => 0.5 - Math.random()).slice(0, 6);
-        
+        list.innerHTML = `<h3 style="font-size:1rem; margin-top:20px;">Workout Overview:</h3>`;
+        currentSession = [...lib[selectedKey].items];
         currentSession.forEach(ex => {
-            const div = document.createElement('div');
-            div.className = 'exercise-item';
-            div.innerHTML = `<div><strong>${ex.name}</strong><br><small>${ex.equip}</small></div><b>${ex.time}s</b>`;
-            list.appendChild(div);
+            const d = document.createElement('div');
+            d.className = 'exercise-preview';
+            d.innerHTML = `<strong>${ex.name}</strong> • ${ex.time}s`;
+            list.appendChild(d);
         });
         document.getElementById('start-btn').style.display = 'block';
     }
 
+    // --- Circuit Logic ---
     async function startCircuit() {
         currentIndex = 0;
         document.getElementById('timer-overlay').style.display = 'flex';
@@ -148,72 +139,66 @@
     function loadCard() {
         clearInterval(timerInt);
         const ex = currentSession[currentIndex];
-        document.getElementById('timer-label').innerText = `EXERCISE ${currentIndex + 1}/${currentSession.length}`;
+        document.getElementById('card-header').innerText = `EXERCISE ${currentIndex + 1}/${currentSession.length}`;
         document.getElementById('card-name').innerText = ex.name;
-        document.getElementById('card-equip').innerText = ex.equip;
-        document.getElementById('card-time').innerText = ex.time;
-        runTimer(ex.time);
+        document.getElementById('card-tip').innerText = ex.tip;
+        document.getElementById('video-frame').src = `https://youtube.com{ex.vid}?autoplay=1&mute=1&loop=1&playlist=${ex.vid}`;
+        
+        timeLeft = ex.time;
+        isPaused = false;
+        document.getElementById('pause-btn').innerText = "PAUSE";
+        updateDisplay();
+        startTimer();
     }
 
-    function runTimer(seconds) {
-        let timeLeft = seconds;
-        const display = document.getElementById('timer-display');
-        const bar = document.getElementById('progress-bar');
+    function startTimer() {
         timerInt = setInterval(() => {
-            display.innerText = timeLeft;
-            bar.style.width = `${((seconds - timeLeft) / seconds) * 100}%`;
-            if (timeLeft <= 3 && timeLeft > 0) beep(400, 100);
-            if (timeLeft <= 0) { clearInterval(timerInt); beep(800, 500); }
-            timeLeft--;
+            if (!isPaused) {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft <= 0) { clearInterval(timerInt); beep(); }
+            }
         }, 1000);
     }
 
-    const surface = document.getElementById('swipe-surface');
-    surface.addEventListener('touchstart', e => touchStartX = e.touches.clientX);
-    surface.addEventListener('touchend', e => {
-        const diff = touchStartX - e.changedTouches.clientX;
-        if (Math.abs(diff) > 60) {
-            if (diff > 0 && currentIndex < currentSession.length - 1) currentIndex++;
-            else if (diff < 0 && currentIndex > 0) currentIndex--;
-            loadCard();
+    function togglePause() {
+        isPaused = !isPaused;
+        document.getElementById('pause-btn').innerText = isPaused ? "RESUME" : "PAUSE";
+    }
+
+    function resetTimer() {
+        timeLeft = currentSession[currentIndex].time;
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        document.getElementById('timer-display').innerText = timeLeft;
+    }
+
+    // --- Enhanced Mobile Swipe ---
+    let touchStartX = 0;
+    document.getElementById('timer-overlay').addEventListener('touchstart', e => touchStartX = e.touches[0].clientX, {passive:true});
+    document.getElementById('timer-overlay').addEventListener('touchend', e => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 70) {
+            if (diff > 0 && currentIndex < currentSession.length - 1) { currentIndex++; loadCard(); }
+            else if (diff < 0 && currentIndex > 0) { currentIndex--; loadCard(); }
         }
-    });
+    }, {passive:true});
+
+    function beep() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        osc.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.5);
+    }
 
     function exitTimer() {
         clearInterval(timerInt);
         if(wakeLock) wakeLock.release();
         document.getElementById('timer-overlay').style.display = 'none';
-        saveHistory();
+        document.getElementById('video-frame').src = "";
     }
-
-    function beep(freq, dur) {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const g = ctx.createGain();
-            osc.connect(g); g.connect(ctx.destination);
-            osc.frequency.value = freq; osc.start();
-            g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + dur/1000);
-            osc.stop(ctx.currentTime + dur/1000);
-        } catch(e) {}
-    }
-
-    function saveHistory() {
-        const modeText = document.getElementById('mode-select').selectedOptions[0].text;
-        const history = JSON.parse(localStorage.getItem('proFitHistory') || "[]");
-        history.unshift({ mode: modeText, date: new Date().toLocaleDateString() });
-        localStorage.setItem('proFitHistory', JSON.stringify(history.slice(0, 10)));
-        renderHistory();
-    }
-
-    function renderHistory() {
-        const list = document.getElementById('history-list');
-        const history = JSON.parse(localStorage.getItem('proFitHistory') || "[]");
-        list.innerHTML = history.length ? history.map(h => `<div class="history-item"><span>${h.mode}</span><span>${h.date}</span></div>`).join('') : '<p style="font-size:0.8rem; opacity:0.5;">No sessions yet.</p>';
-    }
-
-    function clearHistory() { localStorage.removeItem('proFitHistory'); renderHistory(); }
-    window.onload = renderHistory;
 </script>
 </body>
 </html>
