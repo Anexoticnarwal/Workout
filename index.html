@@ -2,164 +2,218 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Workout & Recovery Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pro Fitness & Wellness Suite</title>
     <style>
-        :root { --primary: #2563eb; --recovery: #0d9488; --stretching: #8b5cf6; --hiit: #dc2626; --bg: #f8fafc; --card: #ffffff; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 600px; width: 100%; background: var(--card); padding: 1.5rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
-        h1 { font-size: 1.6rem; color: var(--primary); text-align: center; margin: 0 0 15px; }
-        
-        /* Selectors & Buttons */
-        select, input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; margin-bottom: 10px; color: white; }
-        .btn-main { background: var(--primary); }
-        .btn-timer { background: #1e293b; }
-        
-        /* Workout List */
-        .exercise-item { background: #f1f5f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary); }
-        .mode-tag { font-size: 0.65rem; padding: 3px 8px; border-radius: 5px; color: white; font-weight: bold; text-transform: uppercase; }
-
-        /* Timer Overlay */
-        #timer-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.98); color: white; z-index: 1000; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
-        #timer-display { font-size: 9rem; font-weight: 900; line-height: 1; }
-        #timer-exercise { font-size: 2rem; margin: 20px 0; color: #38bdf8; }
+        :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --accent: #38bdf8; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); }
+        .container { max-width: 500px; margin: 0 auto; background: var(--card); padding: 1.5rem; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        h1 { font-size: 1.6rem; text-align: center; color: var(--primary); margin-bottom: 20px; }
+        label { font-weight: 600; font-size: 0.9rem; color: #64748b; display: block; margin-bottom: 5px; }
+        select, .btn { width: 100%; padding: 16px; margin: 8px 0; border-radius: 14px; font-size: 1rem; border: none; cursor: pointer; transition: 0.2s; }
+        select { border: 2px solid #e2e8f0; background: white; appearance: none; }
+        .btn-main { background: var(--primary); color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-main:active { transform: scale(0.98); }
+        .btn-secondary { background: #1e293b; color: white; }
+        .exercise-item { background: #f1f5f9; padding: 14px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid var(--primary); }
+        #timer-overlay { display: none; position: fixed; inset: 0; background: #0f172a; color: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .workout-card { background: #1e293b; width: 85%; max-width: 380px; border-radius: 30px; padding: 2.5rem; border: 1px solid #334155; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        #progress-container { width: 100%; height: 8px; background: #334155; border-radius: 10px; margin: 25px 0; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: var(--accent); transition: 0.2s linear; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
+        .detail-box { background: #334155; padding: 12px; border-radius: 12px; font-size: 0.85rem; }
+        #history-list { margin-top: 15px; max-height: 150px; overflow-y: auto; }
+        .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="section">
-        <h1>⚡ Pro Fitness Suite</h1>
-        <label>Choose Training Mode:</label>
-        <select id="mode-select">
-            <option value="strength">Full Body Strength (Bands/Ball)</option>
-            <option value="hiit">High Intensity (Bodyweight)</option>
-            <option value="physio">Physio & Mobility (Rehab)</option>
-            <option value="stretch">Recovery & Stretching</option>
-        </select>
-        <button class="btn btn-main" onclick="generateWorkout()">Generate Program</button>
-        <button class="btn btn-timer" id="start-btn" style="display:none;" onclick="startCircuit()">▶ Start Circuit Timer</button>
-    </div>
+    <h1>⚡ Pro Fitness & Wellness</h1>
+    
+    <label>Choose Training Discipline:</label>
+    <select id="mode-select">
+        <optgroup label="Core Fitness">
+            <option value="strength">Full Body Strength</option>
+            <option value="hiit">HIIT & Cardio</option>
+            <option value="mobility">Dynamic Mobility</option>
+        </optgroup>
+        <optgroup label="Rehab & Therapy">
+            <option value="physio">Physio (Back/Knee/Shoulder)</option>
+        </optgroup>
+        <optgroup label="Mind & Body">
+            <option value="yoga_basic">Yoga (Foundational)</option>
+            <option value="yoga_int">Yoga (Intermediate)</option>
+            <option value="pilates_mat">Pilates (Mat Basics)</option>
+            <option value="pilates_adv">Pilates (Advanced Core)</option>
+        </optgroup>
+    </select>
+
+    <button class="btn btn-main" onclick="generateWorkout()">Generate Program</button>
+    <button class="btn btn-secondary" id="start-btn" style="display:none;" onclick="startCircuit()">▶ Start Immersive Circuit</button>
 
     <div id="workout-list"></div>
+
+    <div style="margin-top: 30px;">
+        <h3 style="font-size: 1rem; color: #64748b;">Recent Sessions</h3>
+        <div id="history-list"></div>
+        <button class="btn" style="color: #ef4444; padding: 5px; font-size: 0.8rem; background: none;" onclick="clearHistory()">Clear History</button>
+    </div>
 </div>
 
 <div id="timer-overlay">
-    <div id="timer-label" style="font-size: 1.5rem; opacity: 0.8;">PREPARE</div>
-    <div id="timer-exercise">Exercise Name</div>
-    <div id="timer-display">05</div>
-    <button class="btn" style="width: 150px; background: #ef4444;" onclick="exitTimer()">Stop</button>
+    <div id="timer-label" style="color: var(--accent); font-weight: bold; margin-bottom: 10px;">EXERCISE 1/5</div>
+    <div class="workout-card" id="swipe-surface">
+        <h2 id="card-name" style="margin: 0; font-size: 1.8rem;">---</h2>
+        <div id="timer-display" style="font-size: 6rem; font-weight: 900; margin: 10px 0;">00</div>
+        <div id="progress-container"><div id="progress-bar"></div></div>
+        <div class="detail-grid">
+            <div class="detail-box"><strong>DURATION</strong><br><span id="card-time">--</span>s</div>
+            <div class="detail-box"><strong>SETS</strong><br>3 Active</div>
+            <div class="detail-box" style="grid-column: span 2;"><strong>TARGET / EQUIP</strong><br><span id="card-equip">--</span></div>
+        </div>
+    </div>
+    <p style="font-size: 0.75rem; opacity: 0.5; margin-top: 25px;">← SWIPE CARDS TO NAVIGATE →</p>
+    <button class="btn" style="width: 120px; background: #ef4444; margin-top: 15px;" onclick="exitTimer()">QUIT</button>
 </div>
 
 <script>
-    const exerciseLibrary = {
+    const lib = {
         strength: [
-            { name: "Banded Squats", equip: "Band", time: 45 },
-            { name: "Ball Chest Press", equip: "Ball", time: 45 },
-            { name: "Banded Lat Pulldowns", equip: "Band", time: 45 },
-            { name: "Ball Hamstring Curls", equip: "Ball", time: 40 },
-            { name: "Banded Bicep Curls", equip: "Band", time: 40 },
-            { name: "Ball Wall Squats", equip: "Ball", time: 60 },
-            { name: "Banded Overhead Press", equip: "Band", time: 45 },
-            { name: "Ball Pikes", equip: "Ball", time: 30 }
+            {name: "Banded Squats", equip: "Legs / Band", time: 45}, {name: "Ball Chest Press", equip: "Chest / Ball", time: 45},
+            {name: "Kettlebell Deadlift", equip: "Glutes / KB", time: 45}, {name: "Dumbbell Row", equip: "Back / DB", time: 40},
+            {name: "Banded Bicep Curls", equip: "Arms / Band", time: 40}, {name: "Stability Ball Pikes", equip: "Core / Ball", time: 30}
         ],
         hiit: [
-            { name: "Burpees", equip: "Bodyweight", time: 40 },
-            { name: "Mountain Climbers", equip: "Bodyweight", time: 45 },
-            { name: "Jumping Squats", equip: "Bodyweight", time: 40 },
-            { name: "Plank Jacks", equip: "Bodyweight", time: 45 },
-            { name: "High Knees", equip: "Bodyweight", time: 30 },
-            { name: "Pushups", equip: "Bodyweight", time: 45 },
-            { name: "Bicycle Crunches", equip: "Bodyweight", time: 50 }
+            {name: "Burpees", equip: "Full Body", time: 30}, {name: "Mountain Climbers", equip: "Cardio", time: 45},
+            {name: "Jump Squats", equip: "Power", time: 30}, {name: "Plank Jacks", equip: "Core/Cardio", time: 40},
+            {name: "High Knees", equip: "Cardio", time: 30}, {name: "Lateral Bounds", equip: "Agility", time: 45}
+        ],
+        mobility: [
+            {name: "90/90 Hip Switches", equip: "Hips", time: 60}, {name: "Cat-Cow Flow", equip: "Spine", time: 45},
+            {name: "Prone Swimmers", equip: "Shoulders", time: 45}, {name: "Inchworms", equip: "Hamstrings", time: 60},
+            {name: "World's Greatest Stretch", equip: "Full Body", time: 60}, {name: "Thoracic Rotations", equip: "Upper Back", time: 45}
         ],
         physio: [
-            { name: "Ball Pelvic Tilts", equip: "Ball", time: 60 },
-            { name: "Banded Clamshells", equip: "Band", time: 45 },
-            { name: "Glute Bridges", equip: "Bodyweight", time: 45 },
-            { name: "Ball Bird-Dog", equip: "Ball", time: 45 },
-            { name: "Banded Pull-Aparts", equip: "Band", time: 40 },
-            { name: "Scapular Squeezes", equip: "Bodyweight", time: 30 },
-            { name: "Dead Bugs", equip: "Bodyweight", time: 60 }
+            {name: "Glute Bridges", equip: "Lower Back/Hips", time: 45}, {name: "Dead Bugs", equip: "Core Stability", time: 60},
+            {name: "Banded Clamshells", equip: "Hips / Band", time: 45}, {name: "Scapular Squeezes", equip: "Posture", time: 30},
+            {name: "Bird-Dog", equip: "Spine Stability", time: 45}, {name: "Knee-to-Chest Stretch", equip: "Lower Back", time: 60}
         ],
-        stretch: [
-            { name: "Ball Child’s Pose", equip: "Ball", time: 60 },
-            { name: "Banded Hamstring Stretch", equip: "Band", time: 60 },
-            { name: "Ball Chest Opener", equip: "Ball", time: 60 },
-            { name: "Cat-Cow Flow", equip: "Bodyweight", time: 45 },
-            { name: "Banded Lat Stretch", equip: "Band", time: 45 },
-            { name: "World's Greatest Stretch", equip: "Bodyweight", time: 60 },
-            { name: "Ball Back Extension", equip: "Ball", time: 60 }
+        yoga_basic: [
+            {name: "Mountain Pose (Tadasana)", equip: "Posture", time: 60}, {name: "Downward Dog", equip: "Flexibility", time: 60},
+            {name: "Warrior II", equip: "Strength/Balance", time: 45}, {name: "Tree Pose", equip: "Balance", time: 45},
+            {name: "Child's Pose", equip: "Restorative", time: 60}, {name: "Cobra Pose", equip: "Back Extension", time: 45}
+        ],
+        yoga_int: [
+            {name: "Warrior III", equip: "Advanced Balance", time: 45}, {name: "Crow Pose Prep", equip: "Arm Strength", time: 30},
+            {name: "Triangle Pose", equip: "Side Body", time: 45}, {name: "Plank to Chaturanga", equip: "Flow", time: 40},
+            {name: "Happy Baby", equip: "Deep Hip Opener", time: 60}, {name: "Pigeon Pose", equip: "Glute Stretch", time: 60}
+        ],
+        pilates_mat: [
+            {name: "The Hundred", equip: "Warm-up / Core", time: 60}, {name: "Single Leg Circle", equip: "Hip Mobility", time: 45},
+            {name: "Rolling Like a Ball", equip: "Spine Massage", time: 45}, {name: "Single Leg Stretch", equip: "Abs", time: 45},
+            {name: "Spine Stretch Forward", equip: "Flexibility", time: 60}, {name: "Swan Prep", equip: "Back Strength", time: 45}
+        ],
+        pilates_adv: [
+            {name: "Teaser", equip: "Advanced Core", time: 45}, {name: "The Corkscrew", equip: "Obliques", time: 45},
+            {name: "Leg Pull Front", equip: "Stability", time: 45}, {name: "Side Kick Kneeling", equip: "Glutes/Balance", time: 45},
+            {name: "Boomerang", equip: "Articulation", time: 60}, {name: "Pilates Push-up", equip: "Upper Body", time: 60}
         ]
     };
 
-    let currentSession = [];
-    let timerInt;
+    let currentSession = [], currentIndex = 0, timerInt, wakeLock = null, touchStartX = 0;
 
     function generateWorkout() {
         const mode = document.getElementById('mode-select').value;
         const list = document.getElementById('workout-list');
         list.innerHTML = '';
-        
-        currentSession = [...exerciseLibrary[mode]].sort(() => 0.5 - Math.random()).slice(0, 6);
+        currentSession = [...lib[mode]].sort(() => 0.5 - Math.random()).slice(0, 6);
         
         currentSession.forEach(ex => {
             const div = document.createElement('div');
             div.className = 'exercise-item';
-            div.style.borderLeftColor = getModeColor(mode);
-            div.innerHTML = `
-                <div>
-                    <span class="mode-tag" style="background:${getModeColor(mode)}">${mode}</span><br>
-                    <strong>${ex.name}</strong>
-                </div>
-                <div style="font-weight:bold; color:#64748b">${ex.time}s</div>
-            `;
+            div.innerHTML = `<div><strong>${ex.name}</strong><br><small>${ex.equip}</small></div><b>${ex.time}s</b>`;
             list.appendChild(div);
         });
         document.getElementById('start-btn').style.display = 'block';
     }
 
-    function getModeColor(mode) {
-        const colors = { strength: '#2563eb', hiit: '#dc2626', physio: '#0d9488', stretch: '#8b5cf6' };
-        return colors[mode];
-    }
-
     async function startCircuit() {
-        const overlay = document.getElementById('timer-overlay');
-        overlay.style.display = 'flex';
+        currentIndex = 0;
+        document.getElementById('timer-overlay').style.display = 'flex';
+        try { if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+        loadCard();
+    }
 
-        for (const ex of currentSession) {
-            document.getElementById('timer-label').innerText = "PREPARE (Rest)";
-            document.getElementById('timer-exercise').innerText = "Next: " + ex.name;
-            await runCountdown(10); // 10s Rest
+    function loadCard() {
+        clearInterval(timerInt);
+        const ex = currentSession[currentIndex];
+        document.getElementById('timer-label').innerText = `EXERCISE ${currentIndex + 1}/${currentSession.length}`;
+        document.getElementById('card-name').innerText = ex.name;
+        document.getElementById('card-equip').innerText = ex.equip;
+        document.getElementById('card-time').innerText = ex.time;
+        runTimer(ex.time);
+    }
 
-            document.getElementById('timer-label').innerText = "GO!";
-            document.getElementById('timer-exercise').innerText = ex.name;
-            await runCountdown(ex.time); // Exercise time
+    function runTimer(seconds) {
+        let timeLeft = seconds;
+        const display = document.getElementById('timer-display');
+        const bar = document.getElementById('progress-bar');
+        timerInt = setInterval(() => {
+            display.innerText = timeLeft;
+            bar.style.width = `${((seconds - timeLeft) / seconds) * 100}%`;
+            if (timeLeft <= 3 && timeLeft > 0) beep(400, 100);
+            if (timeLeft <= 0) { clearInterval(timerInt); beep(800, 500); }
+            timeLeft--;
+        }, 1000);
+    }
+
+    const surface = document.getElementById('swipe-surface');
+    surface.addEventListener('touchstart', e => touchStartX = e.touches.clientX);
+    surface.addEventListener('touchend', e => {
+        const diff = touchStartX - e.changedTouches.clientX;
+        if (Math.abs(diff) > 60) {
+            if (diff > 0 && currentIndex < currentSession.length - 1) currentIndex++;
+            else if (diff < 0 && currentIndex > 0) currentIndex--;
+            loadCard();
         }
-        
-        document.getElementById('timer-label').innerText = "DONE!";
-        document.getElementById('timer-exercise').innerText = "Workout Logged!";
-        setTimeout(exitTimer, 3000);
-    }
-
-    function runCountdown(seconds) {
-        return new Promise(resolve => {
-            let timeLeft = seconds;
-            document.getElementById('timer-display').innerText = timeLeft;
-            timerInt = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer-display').innerText = timeLeft;
-                if(timeLeft <= 0) { clearInterval(timerInt); resolve(); }
-            }, 1000);
-        });
-    }
+    });
 
     function exitTimer() {
         clearInterval(timerInt);
+        if(wakeLock) wakeLock.release();
         document.getElementById('timer-overlay').style.display = 'none';
+        saveHistory();
     }
+
+    function beep(freq, dur) {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.connect(g); g.connect(ctx.destination);
+            osc.frequency.value = freq; osc.start();
+            g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + dur/1000);
+            osc.stop(ctx.currentTime + dur/1000);
+        } catch(e) {}
+    }
+
+    function saveHistory() {
+        const modeText = document.getElementById('mode-select').selectedOptions[0].text;
+        const history = JSON.parse(localStorage.getItem('proFitHistory') || "[]");
+        history.unshift({ mode: modeText, date: new Date().toLocaleDateString() });
+        localStorage.setItem('proFitHistory', JSON.stringify(history.slice(0, 10)));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        const history = JSON.parse(localStorage.getItem('proFitHistory') || "[]");
+        list.innerHTML = history.length ? history.map(h => `<div class="history-item"><span>${h.mode}</span><span>${h.date}</span></div>`).join('') : '<p style="font-size:0.8rem; opacity:0.5;">No sessions yet.</p>';
+    }
+
+    function clearHistory() { localStorage.removeItem('proFitHistory'); renderHistory(); }
+    window.onload = renderHistory;
 </script>
 </body>
 </html>
