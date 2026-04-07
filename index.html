@@ -1,174 +1,150 @@
 <!DOCTYPE html>
-<html lang="en-CA">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Elite Hub Pro</title>
-    <style>
-        :root { --primary: #0f172a; --accent: #2563eb; --bg: #f8fafc; --text: #1e293b; --card: #ffffff; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--text); touch-action: manipulation; }
-        .container { max-width: 600px; margin: 0 auto; padding-bottom: 60px; }
-        
-        /* Dashboard Grid */
-        .tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; }
-        .tile { background: var(--card); padding: 20px 10px; border-radius: 12px; text-align: center; cursor: pointer; border: 1px solid #e2e8f0; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; }
-        .tile.selected { border-color: var(--accent); background: #eff6ff; }
-
-        /* Selection & Drag/Drop */
-        #selection-zone { display: none; margin-top: 20px; }
-        .ex-list-item { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; align-items: center; border: 1px solid #e2e8f0; cursor: grab; }
-        .ex-list-item.dragging { opacity: 0.5; background: #f1f5f9; }
-        .drag-handle { margin-right: 15px; color: #cbd5e1; font-size: 1.2rem; cursor: grab; }
-        .ex-checkbox { width: 20px; height: 20px; margin-right: 12px; }
-
-        /* Immersive Timer Overlay */
-        #timer-overlay { display: none; position: fixed; inset: 0; background: #0f172a; color: white; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; touch-action: none; }
-        .workout-card { background: #1e293b; width: 100%; max-width: 400px; border-radius: 28px; padding: 1.5rem; border: 1px solid #334155; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        #timer-display { font-size: 6rem; font-weight: 900; color: #38bdf8; margin: 10px 0; }
-        
-        /* Form Instructions Modal */
-        .how-to-box { display: none; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; margin-top: 15px; font-size: 0.85rem; text-align: left; border-left: 4px solid var(--accent); line-height: 1.4; }
-        .btn { width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        .btn-main { background: var(--accent); color: white; }
-        .btn-info { background: #334155; color: #94a3b8; font-size: 0.7rem; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elite Hub Pro V4</title>
+<style>
+:root{--accent:#2563eb;--bg:#f8fafc}
+body{font-family:system-ui;margin:0;padding:15px;background:var(--bg)}
+.container{max-width:650px;margin:auto}
+.tile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{background:#fff;padding:14px;border-radius:10px;text-align:center;font-weight:700;cursor:pointer;border:1px solid #ddd}
+.tile.selected{background:#dbeafe;border-color:var(--accent)}
+.ex-item{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:10px;margin-bottom:6px;border-radius:8px;border:1px solid #ddd}
+.controls{display:flex;gap:5px}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;margin-top:10px;font-weight:700}
+.btn-main{background:var(--accent);color:white}
+.overlay{display:none;position:fixed;inset:0;background:#0f172a;color:white;flex-direction:column;align-items:center;justify-content:center}
+#timer{font-size:64px}
+.small{font-size:12px;opacity:.7}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <h1 style="font-weight: 900; letter-spacing: -1px;">ELITE HUB PRO</h1>
-    <div class="tile-grid" id="category-tiles"></div>
+<h1>ELITE HUB PRO V4</h1>
+<div id="tiles" class="tile-grid"></div>
 
-    <div id="selection-zone">
-        <h3 style="font-size: 0.8rem; color: #64748b; margin-bottom: 10px;">SELECT & DRAG TO REORDER:</h3>
-        <div id="exercise-options"></div>
-        <button class="btn btn-main" onclick="startCircuit()">▶ START WORKOUT</button>
-    </div>
+<div id="selection-zone" style="display:none">
+<h3>Select + Customize</h3>
+<div id="exercise-list"></div>
+<label>Exercise Time: <input id="exTime" type="number" value="60"></label>
+<label>Rest Time: <input id="restTime" type="number" value="15"></label>
+<button class="btn btn-main" onclick="startWorkout()">START</button>
 </div>
 
-<div id="timer-overlay">
-    <div class="workout-card" id="swipe-surface">
-        <div id="card-header" style="opacity: 0.5; font-size: 0.7rem; font-weight: 800;">EXERCISE 1/5</div>
-        <h2 id="card-name" style="margin: 10px 0; text-transform: uppercase; font-size: 1.4rem;">---</h2>
-        
-        <div id="timer-display">00</div>
-        
-        <div style="display: flex; gap: 8px;">
-            <button id="pause-btn" class="btn btn-main" style="background:#f59e0b" onclick="togglePause()">PAUSE</button>
-            <button class="btn btn-main" style="background:#64748b" onclick="resetTimer()">RESET</button>
-        </div>
+<h3>Saved Workouts</h3>
+<div id="saved"></div>
+</div>
 
-        <button class="btn btn-info" onclick="toggleHowTo()">How to do this? ⓘ</button>
-        <div id="how-to-content" class="how-to-box"></div>
-    </div>
-    <p style="font-size: 0.65rem; opacity: 0.4; margin-top: 30px;">← SWIPE TO NAVIGATE →</p>
-    <button style="margin-top: 20px; background:none; border:none; color:#ef4444; font-weight:900;" onclick="exitTimer()">END SESSION</button>
+<div id="overlay" class="overlay">
+<div id="progress" class="small"></div>
+<h2 id="name"></h2>
+<div id="timer">60</div>
+<div id="phase" class="small"></div>
+<button class="btn" onclick="togglePause()">Pause</button>
+<button class="btn" onclick="skip()">Skip</button>
+<button class="btn" onclick="end()">End</button>
 </div>
 
 <script>
-    const plans = {
-        "Bodybuilding": [
-            { name: "Bench Press", info: "1. Lie flat. 2. Grip bar slightly wider than shoulders. 3. Lower to chest. 4. Press up." },
-            { name: "Back Squat", info: "1. Bar on upper back. 2. Feet shoulder width. 3. Sit back until thighs are parallel. 4. Drive up." },
-            { name: "Deadlift", info: "1. Feet hip width. 2. Grip bar outside legs. 3. Keep back flat. 4. Stand up, pulling bar close to shins." }
-        ],
-        "Knee Rehab": [
-            { name: "Quad Sets", info: "1. Sit with leg straight. 2. Tighten thigh muscle. 3. Push back of knee into floor. 4. Hold 5s." },
-            { name: "Straight Leg Raise", info: "1. Lie on back. 2. One knee bent, other straight. 3. Lift straight leg 12 inches. 4. Lower slowly." }
-        ],
-        "Yoga Flow": [
-            { name: "Downward Dog", info: "1. Start on hands and knees. 2. Lift hips toward ceiling. 3. Push through palms. 4. Reach heels to floor." }
-        ]
-        // Add more plans following this structure...
-    };
+// categories
+const cats=["Strength","Cardio","Core","Mobility","Rehab","Yoga"];
+let all=[];
+cats.forEach(c=>{
+ for(let i=1;i<=25;i++){
+  all.push({name:c+" Move "+i,cat:c});
+ }
+});
 
-    let selectedKey = null, currentSession = [], currentIndex = 0, timerInt, timeLeft, isPaused = false;
-    let touchStartX = 0, touchStartY = 0;
+// plans
+const plans={};
+let names=["Full","Strength","Cardio","HIIT","Core","Yoga","Pilates","Stretch","Rehab","Bands","Athletic","Endurance","Explosive","Mobility","Beginner","Advanced","Upper","Lower","Balance","Recovery"];
+names.forEach((n,i)=>{plans[n]=all.slice(i*5,i*5+20)});
 
-    // Build Category Tiles
-    const grid = document.getElementById('category-tiles');
-    Object.keys(plans).forEach(key => {
-        const t = document.createElement('div');
-        t.className = 'tile';
-        t.innerText = key;
-        t.onclick = () => {
-            document.querySelectorAll('.tile').forEach(el => el.classList.remove('selected'));
-            t.classList.add('selected');
-            selectedKey = key;
-            renderSelection(key);
-        };
-        grid.appendChild(t);
-    });
+let selected=null,session=[],i=0,timer=60,int=null,paused=false,isRest=false;
 
-    function renderSelection(key) {
-        const list = document.getElementById('exercise-options');
-        document.getElementById('selection-zone').style.display = 'block';
-        list.innerHTML = plans[key].map((ex, i) => `
-            <div class="ex-list-item" draggable="true" ondragstart="handleDragStart(event)" ondragover="handleDragOver(event)">
-                <span class="drag-handle">⠿</span>
-                <input type="checkbox" class="ex-checkbox" checked value="${i}">
-                <span style="font-weight:700">${ex.name}</span>
-            </div>
-        `).join('');
-    }
+// UI
+const tiles=document.getElementById('tiles');
+Object.keys(plans).forEach(p=>{
+ let d=document.createElement('div');
+ d.className='tile';
+ d.innerText=p;
+ d.onclick=()=>{select(p,d)};
+ tiles.appendChild(d);
+});
 
-    // Drag and Drop Logic
-    function handleDragStart(e) { e.target.classList.add('dragging'); }
-    function handleDragOver(e) {
-        e.preventDefault();
-        const list = document.getElementById('exercise-options');
-        const dragging = document.querySelector('.dragging');
-        const sibling = Array.from(list.children).find(child => e.clientY <= child.offsetTop + child.offsetHeight / 2);
-        list.insertBefore(dragging, sibling);
-    }
-    document.addEventListener('dragend', (e) => e.target.classList.remove('dragging'));
+function select(p,el){
+ document.querySelectorAll('.tile').forEach(t=>t.classList.remove('selected'));
+ el.classList.add('selected');
+ selected=p; render();
+}
 
-    function startCircuit() {
-        const items = document.querySelectorAll('.ex-list-item');
-        currentSession = Array.from(items).filter(item => item.querySelector('input').checked)
-                                         .map(item => plans[selectedKey][item.querySelector('input').value]);
-        if (!currentSession.length) return alert("Select at least one exercise!");
-        currentIndex = 0;
-        document.getElementById('timer-overlay').style.display = 'flex';
-        loadCard();
-    }
+function render(){
+ let list=document.getElementById('exercise-list');
+ document.getElementById('selection-zone').style.display='block';
+ list.innerHTML='';
+ plans[selected].forEach((e,idx)=>{
+  let div=document.createElement('div');
+  div.className='ex-item';
+  div.innerHTML=`<span>${e.name} (${e.cat})</span>
+  <div class='controls'>
+  <button onclick='up(${idx})'>↑</button>
+  <button onclick='down(${idx})'>↓</button>
+  <input type='checkbox' checked value='${idx}'>
+  </div>`;
+  list.appendChild(div);
+ });
+}
 
-    function loadCard() {
-        clearInterval(timerInt);
-        const ex = currentSession[currentIndex];
-        document.getElementById('card-header').innerText = `EXERCISE ${currentIndex + 1}/${currentSession.length}`;
-        document.getElementById('card-name').innerText = ex.name;
-        document.getElementById('how-to-content').innerText = ex.info;
-        document.getElementById('how-to-content').style.display = 'none';
-        timeLeft = 60; isPaused = false;
-        document.getElementById('pause-btn').innerText = "PAUSE";
-        updateDisplay();
-        startTimer();
-    }
+function up(x){if(x===0)return;let a=plans[selected];[a[x-1],a[x]]=[a[x],a[x-1]];render()}
+function down(x){let a=plans[selected];if(x===a.length-1)return;[a[x+1],a[x]]=[a[x],a[x+1]];render()}
 
-    // SWIPE ENGINE
-    const overlay = document.getElementById('timer-overlay');
-    overlay.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: false});
-    overlay.addEventListener('touchmove', e => e.preventDefault(), {passive: false}); // Stop page scroll
-    overlay.addEventListener('touchend', e => {
-        const diffX = touchStartX - e.changedTouches[0].clientX;
-        const diffY = touchStartY - e.changedTouches[0].clientY;
-        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 60) {
-            if (diffX > 0 && currentIndex < currentSession.length - 1) { currentIndex++; loadCard(); }
-            else if (diffX < 0 && currentIndex > 0) { currentIndex--; loadCard(); }
-        }
-    });
+function startWorkout(){
+ let items=document.querySelectorAll('.ex-item');
+ session=[...items].filter(i=>i.querySelector('input').checked)
+  .map(i=>plans[selected][i.querySelector('input').value]);
+ if(!session.length)return alert('Select exercises');
+ localStorage.setItem('savedWorkout',JSON.stringify(session));
+ i=0; isRest=false;
+ document.getElementById('overlay').style.display='flex';
+ load();
+}
 
-    function toggleHowTo() {
-        const box = document.getElementById('how-to-content');
-        box.style.display = box.style.display === 'none' ? 'block' : 'none';
-    }
+function load(){
+ clearInterval(int);
+ paused=false;
+ let exTime=+document.getElementById('exTime').value;
+ let restTime=+document.getElementById('restTime').value;
+ timer=isRest?restTime:exTime;
+ document.getElementById('name').innerText=isRest?'REST':session[i].name;
+ document.getElementById('phase').innerText=isRest?'Rest':'Work';
+ document.getElementById('progress').innerText=`${i+1}/${session.length}`;
+ update();
+ int=setInterval(run,1000);
+}
 
-    function startTimer() { timerInt = setInterval(() => { if(!isPaused) { timeLeft--; updateDisplay(); if(timeLeft <= 0) clearInterval(timerInt); } }, 1000); }
-    function togglePause() { isPaused = !isPaused; document.getElementById('pause-btn').innerText = isPaused ? "RESUME" : "PAUSE"; }
-    function resetTimer() { timeLeft = 60; updateDisplay(); }
-    function updateDisplay() { document.getElementById('timer-display').innerText = timeLeft; }
-    function exitTimer() { clearInterval(timerInt); document.getElementById('timer-overlay').style.display = 'none'; }
+function run(){
+ if(paused)return;
+ timer--; update();
+ if(timer<=0){
+  if(!isRest){isRest=true;load()}
+  else{
+   isRest=false;
+   if(i<session.length-1){i++;load()} else{alert('Done');end()}
+  }
+ }
+}
+
+function update(){document.getElementById('timer').innerText=timer}
+function togglePause(){paused=!paused}
+function skip(){i++;if(i>=session.length)return end();load()}
+function end(){clearInterval(int);document.getElementById('overlay').style.display='none'}
+
+// saved workouts
+const savedDiv=document.getElementById('saved');
+let saved=JSON.parse(localStorage.getItem('savedWorkout')||'[]');
+savedDiv.innerText=saved.length?`Last: ${saved.length} exercises saved`:'';
 </script>
 </body>
 </html>
