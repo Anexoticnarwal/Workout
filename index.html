@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elite Hub Pro V4</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Elite Hub Pro V4.1</title>
 <style>
 :root{--accent:#2563eb;--bg:#f8fafc}
-body{font-family:system-ui;margin:0;padding:15px;background:var(--bg)}
+html,body{min-height:100%;margin:0;padding:15px;background:var(--bg);overflow-x:hidden;}
+body{font-family:system-ui;}
 .container{max-width:650px;margin:auto}
 .tile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .tile{background:#fff;padding:14px;border-radius:10px;text-align:center;font-weight:700;cursor:pointer;border:1px solid #ddd}
@@ -15,21 +16,22 @@ body{font-family:system-ui;margin:0;padding:15px;background:var(--bg)}
 .controls{display:flex;gap:5px}
 .btn{width:100%;padding:12px;border:none;border-radius:10px;margin-top:10px;font-weight:700}
 .btn-main{background:var(--accent);color:white}
-.overlay{display:none;position:fixed;inset:0;background:#0f172a;color:white;flex-direction:column;align-items:center;justify-content:center}
+.overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;min-height:100%;touch-action:none;flex-direction:column;align-items:center;justify-content:center;background:#0f172a;color:white;padding:15px;box-sizing:border-box}
 #timer{font-size:64px}
 .small{font-size:12px;opacity:.7}
+input[type=number]{width:60px;}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>ELITE HUB PRO V4</h1>
+<h1>ELITE HUB PRO V4.1</h1>
 <div id="tiles" class="tile-grid"></div>
 
 <div id="selection-zone" style="display:none">
 <h3>Select + Customize</h3>
 <div id="exercise-list"></div>
-<label>Exercise Time: <input id="exTime" type="number" value="60"></label>
-<label>Rest Time: <input id="restTime" type="number" value="15"></label>
+<label>Exercise Time: <input id="exTime" type="number" inputmode="numeric" pattern="[0-9]*" value="60"></label>
+<label>Rest Time: <input id="restTime" type="number" inputmode="numeric" pattern="[0-9]*" value="15"></label>
 <button class="btn btn-main" onclick="startWorkout()">START</button>
 </div>
 
@@ -48,19 +50,16 @@ body{font-family:system-ui;margin:0;padding:15px;background:var(--bg)}
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function(){
 // categories
 const cats=["Strength","Cardio","Core","Mobility","Rehab","Yoga"];
 let all=[];
-cats.forEach(c=>{
- for(let i=1;i<=25;i++){
-  all.push({name:c+" Move "+i,cat:c});
- }
-});
+cats.forEach(c=>{for(let i=1;i<=25;i++){all.push({name:c+" Move "+i,cat:c});}});
 
 // plans
 const plans={};
 let names=["Full","Strength","Cardio","HIIT","Core","Yoga","Pilates","Stretch","Rehab","Bands","Athletic","Endurance","Explosive","Mobility","Beginner","Advanced","Upper","Lower","Balance","Recovery"];
-names.forEach((n,i)=>{plans[n]=all.slice(i*5,i*5+20)});
+names.forEach((n,i)=>{plans[n]=all.slice(i*5,i*5+20);});
 
 let selected=null,session=[],i=0,timer=60,int=null,paused=false,isRest=false;
 
@@ -74,11 +73,7 @@ Object.keys(plans).forEach(p=>{
  tiles.appendChild(d);
 });
 
-function select(p,el){
- document.querySelectorAll('.tile').forEach(t=>t.classList.remove('selected'));
- el.classList.add('selected');
- selected=p; render();
-}
+function select(p,el){document.querySelectorAll('.tile').forEach(t=>t.classList.remove('selected')); el.classList.add('selected'); selected=p; render();}
 
 function render(){
  let list=document.getElementById('exercise-list');
@@ -97,23 +92,21 @@ function render(){
  });
 }
 
-function up(x){if(x===0)return;let a=plans[selected];[a[x-1],a[x]]=[a[x],a[x-1]];render()}
-function down(x){let a=plans[selected];if(x===a.length-1)return;[a[x+1],a[x]]=[a[x],a[x+1]];render()}
+function up(x){if(x===0)return;let a=plans[selected];[a[x-1],a[x]]=[a[x],a[x-1]];render();}
+function down(x){let a=plans[selected];if(x===a.length-1)return;[a[x+1],a[x]]=[a[x],a[x+1]];render();}
 
 function startWorkout(){
  let items=document.querySelectorAll('.ex-item');
- session=[...items].filter(i=>i.querySelector('input').checked)
-  .map(i=>plans[selected][i.querySelector('input').value]);
+ session=[...items].filter(i=>i.querySelector('input').checked).map(i=>plans[selected][i.querySelector('input').value]);
  if(!session.length)return alert('Select exercises');
- localStorage.setItem('savedWorkout',JSON.stringify(session));
+ try{localStorage.setItem('savedWorkout',JSON.stringify(session));}catch(e){console.warn('LocalStorage blocked:',e);}
  i=0; isRest=false;
  document.getElementById('overlay').style.display='flex';
  load();
 }
 
 function load(){
- clearInterval(int);
- paused=false;
+ clearInterval(int); paused=false;
  let exTime=+document.getElementById('exTime').value;
  let restTime=+document.getElementById('restTime').value;
  timer=isRest?restTime:exTime;
@@ -128,23 +121,24 @@ function run(){
  if(paused)return;
  timer--; update();
  if(timer<=0){
-  if(!isRest){isRest=true;load()}
+  if(!isRest){isRest=true;load();}
   else{
    isRest=false;
-   if(i<session.length-1){i++;load()} else{alert('Done');end()}
+   if(i<session.length-1){i++;load();} else{alert('Workout Complete'); end();}
   }
  }
 }
 
-function update(){document.getElementById('timer').innerText=timer}
-function togglePause(){paused=!paused}
-function skip(){i++;if(i>=session.length)return end();load()}
-function end(){clearInterval(int);document.getElementById('overlay').style.display='none'}
+function update(){document.getElementById('timer').innerText=timer;}
+function togglePause(){paused=!paused;}
+function skip(){i++;if(i>=session.length)return end(); load();}
+function end(){clearInterval(int);document.getElementById('overlay').style.display='none';}
 
 // saved workouts
 const savedDiv=document.getElementById('saved');
 let saved=JSON.parse(localStorage.getItem('savedWorkout')||'[]');
 savedDiv.innerText=saved.length?`Last: ${saved.length} exercises saved`:'';
+});
 </script>
 </body>
 </html>
