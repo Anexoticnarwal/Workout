@@ -1,144 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Elite Hub Pro V4.1</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elite Hub Pro V5</title>
 <style>
-:root{--accent:#2563eb;--bg:#f8fafc}
-html,body{min-height:100%;margin:0;padding:15px;background:var(--bg);overflow-x:hidden;}
-body{font-family:system-ui;}
-.container{max-width:650px;margin:auto}
-.tile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.tile{background:#fff;padding:14px;border-radius:10px;text-align:center;font-weight:700;cursor:pointer;border:1px solid #ddd}
-.tile.selected{background:#dbeafe;border-color:var(--accent)}
-.ex-item{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:10px;margin-bottom:6px;border-radius:8px;border:1px solid #ddd}
-.controls{display:flex;gap:5px}
-.btn{width:100%;padding:12px;border:none;border-radius:10px;margin-top:10px;font-weight:700}
-.btn-main{background:var(--accent);color:white}
-.overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;min-height:100%;touch-action:none;flex-direction:column;align-items:center;justify-content:center;background:#0f172a;color:white;padding:15px;box-sizing:border-box}
-#timer{font-size:64px}
-.small{font-size:12px;opacity:.7}
-input[type=number]{width:60px;}
+:root{
+  --bg:#f4f7fb;--card:#ffffff;--accent:#2563eb;--text:#0f172a;--muted:#64748b;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+.container{max-width:600px;margin:auto;padding:15px}
+h1{font-size:1.6rem;margin:10px 0;font-weight:900}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{background:var(--card);padding:16px;border-radius:14px;text-align:center;font-weight:800;border:1px solid #e2e8f0}
+.tile.active{background:#e0ecff;border-color:var(--accent)}
+.card{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 10px 25px rgba(0,0,0,0.05);margin-top:10px}
+.exercise{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #eee}
+.exercise:last-child{border-bottom:none}
+button{border:none;border-radius:12px;padding:14px;font-weight:800;width:100%;margin-top:10px}
+.primary{background:var(--accent);color:white}
+.secondary{background:#e2e8f0}
+#overlay{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+.timer{font-size:4rem;font-weight:900;color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>ELITE HUB PRO V4.1</h1>
-<div id="tiles" class="tile-grid"></div>
-
-<div id="selection-zone" style="display:none">
-<h3>Select + Customize</h3>
-<div id="exercise-list"></div>
-<label>Exercise Time: <input id="exTime" type="number" inputmode="numeric" pattern="[0-9]*" value="60"></label>
-<label>Rest Time: <input id="restTime" type="number" inputmode="numeric" pattern="[0-9]*" value="15"></label>
-<button class="btn btn-main" onclick="startWorkout()">START</button>
+<h1>Elite Hub Pro</h1>
+<div id="plans" class="grid"></div>
+<div id="exerciseList"></div>
 </div>
 
-<h3>Saved Workouts</h3>
-<div id="saved"></div>
+<div id="overlay">
+<div class="card" style="width:100%;max-width:400px">
+<div id="progress" style="font-size:0.8rem;color:var(--muted)"></div>
+<h2 id="exName"></h2>
+<p id="exInfo"></p>
+<div class="timer" id="timer">30</div>
+<button class="primary" onclick="pause()" id="pauseBtn">Pause</button>
+<button class="secondary" onclick="nextEx()">Skip</button>
+<button class="secondary" onclick="endWorkout()">End</button>
 </div>
-
-<div id="overlay" class="overlay">
-<div id="progress" class="small"></div>
-<h2 id="name"></h2>
-<div id="timer">60</div>
-<div id="phase" class="small"></div>
-<button class="btn" onclick="togglePause()">Pause</button>
-<button class="btn" onclick="skip()">Skip</button>
-<button class="btn" onclick="end()">End</button>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function(){
-// categories
-const cats=["Strength","Cardio","Core","Mobility","Rehab","Yoga"];
-let all=[];
-cats.forEach(c=>{for(let i=1;i<=25;i++){all.push({name:c+" Move "+i,cat:c});}});
+const plans={
+"Full Body":[
+{name:"Push Ups",info:"Keep body straight, lower chest, push up"},
+{name:"Squats",info:"Sit back, knees over toes, stand up"},
+{name:"Plank",info:"Hold straight body, tighten core"}
+],
+"Yoga":[
+{name:"Downward Dog",info:"Lift hips, press hands down"},
+{name:"Child Pose",info:"Sit back, stretch arms forward"}
+]
+};
 
-// plans
-const plans={};
-let names=["Full","Strength","Cardio","HIIT","Core","Yoga","Pilates","Stretch","Rehab","Bands","Athletic","Endurance","Explosive","Mobility","Beginner","Advanced","Upper","Lower","Balance","Recovery"];
-names.forEach((n,i)=>{plans[n]=all.slice(i*5,i*5+20);});
-
-let selected=null,session=[],i=0,timer=60,int=null,paused=false,isRest=false;
-
-// UI
-const tiles=document.getElementById('tiles');
-Object.keys(plans).forEach(p=>{
- let d=document.createElement('div');
- d.className='tile';
- d.innerText=p;
- d.onclick=()=>{select(p,d)};
- tiles.appendChild(d);
-});
-
-function select(p,el){document.querySelectorAll('.tile').forEach(t=>t.classList.remove('selected')); el.classList.add('selected'); selected=p; render();}
-
-function render(){
- let list=document.getElementById('exercise-list');
- document.getElementById('selection-zone').style.display='block';
- list.innerHTML='';
- plans[selected].forEach((e,idx)=>{
-  let div=document.createElement('div');
-  div.className='ex-item';
-  div.innerHTML=`<span>${e.name} (${e.cat})</span>
-  <div class='controls'>
-  <button onclick='up(${idx})'>↑</button>
-  <button onclick='down(${idx})'>↓</button>
-  <input type='checkbox' checked value='${idx}'>
-  </div>`;
-  list.appendChild(div);
- });
+// generate many exercises
+for(let i=1;i<=100;i++){
+ if(!plans["Full Body"])plans["Full Body"]=[];
+ plans["Full Body"].push({name:"Exercise "+i,info:"Step 1 do movement. Step 2 control form. Step 3 repeat."});
 }
 
-function up(x){if(x===0)return;let a=plans[selected];[a[x-1],a[x]]=[a[x],a[x-1]];render();}
-function down(x){let a=plans[selected];if(x===a.length-1)return;[a[x+1],a[x]]=[a[x],a[x+1]];render();}
+let selectedPlan=null;
+let workout=[];
+let index=0;
+let time=30;
+let interval=null;
+let paused=false;
+
+const plansDiv=document.getElementById("plans");
+const listDiv=document.getElementById("exerciseList");
+
+Object.keys(plans).forEach(p=>{
+ let d=document.createElement("div");
+ d.className="tile";
+ d.innerText=p;
+ d.onclick=()=>selectPlan(p,d);
+ plansDiv.appendChild(d);
+});
+
+function selectPlan(p,el){
+ document.querySelectorAll(".tile").forEach(t=>t.classList.remove("active"));
+ el.classList.add("active");
+ selectedPlan=p;
+ renderExercises();
+}
+
+function renderExercises(){
+ listDiv.innerHTML="";
+ plans[selectedPlan].forEach((ex,i)=>{
+ let div=document.createElement("div");
+ div.className="exercise";
+ div.innerHTML=`<input type='checkbox' checked data-i='${i}'/><span>${ex.name}</span>`;
+ listDiv.appendChild(div);
+ });
+ let btn=document.createElement("button");
+ btn.className="primary";
+ btn.innerText="Start Workout";
+ btn.onclick=startWorkout;
+ listDiv.appendChild(btn);
+}
 
 function startWorkout(){
- let items=document.querySelectorAll('.ex-item');
- session=[...items].filter(i=>i.querySelector('input').checked).map(i=>plans[selected][i.querySelector('input').value]);
- if(!session.length)return alert('Select exercises');
- try{localStorage.setItem('savedWorkout',JSON.stringify(session));}catch(e){console.warn('LocalStorage blocked:',e);}
- i=0; isRest=false;
- document.getElementById('overlay').style.display='flex';
- load();
-}
-
-function load(){
- clearInterval(int); paused=false;
- let exTime=+document.getElementById('exTime').value;
- let restTime=+document.getElementById('restTime').value;
- timer=isRest?restTime:exTime;
- document.getElementById('name').innerText=isRest?'REST':session[i].name;
- document.getElementById('phase').innerText=isRest?'Rest':'Work';
- document.getElementById('progress').innerText=`${i+1}/${session.length}`;
- update();
- int=setInterval(run,1000);
-}
-
-function run(){
- if(paused)return;
- timer--; update();
- if(timer<=0){
-  if(!isRest){isRest=true;load();}
-  else{
-   isRest=false;
-   if(i<session.length-1){i++;load();} else{alert('Workout Complete'); end();}
-  }
+ workout=[];
+ document.querySelectorAll("input[type=checkbox]").forEach(cb=>{
+ if(cb.checked){
+ workout.push(plans[selectedPlan][cb.dataset.i]);
  }
+ });
+ if(workout.length===0)return alert("Select exercises");
+ index=0;
+ document.getElementById("overlay").style.display="flex";
+ loadEx();
 }
 
-function update(){document.getElementById('timer').innerText=timer;}
-function togglePause(){paused=!paused;}
-function skip(){i++;if(i>=session.length)return end(); load();}
-function end(){clearInterval(int);document.getElementById('overlay').style.display='none';}
+function loadEx(){
+ clearInterval(interval);
+ time=30;
+ paused=false;
+ let ex=workout[index];
+ document.getElementById("exName").innerText=ex.name;
+ document.getElementById("exInfo").innerText=ex.info;
+ document.getElementById("progress").innerText=`${index+1}/${workout.length}`;
+ updateTimer();
+ interval=setInterval(()=>{
+ if(!paused){time--;updateTimer();if(time<=0)nextEx();}
+ },1000);
+}
 
-// saved workouts
-const savedDiv=document.getElementById('saved');
-let saved=JSON.parse(localStorage.getItem('savedWorkout')||'[]');
-savedDiv.innerText=saved.length?`Last: ${saved.length} exercises saved`:'';
-});
+function updateTimer(){document.getElementById("timer").innerText=time}
+
+function pause(){paused=!paused;document.getElementById("pauseBtn").innerText=paused?"Resume":"Pause"}
+
+function nextEx(){
+ index++;
+ if(index>=workout.length){endWorkout();return}
+ loadEx();
+}
+
+function endWorkout(){
+ clearInterval(interval);
+ document.getElementById("overlay").style.display="none";
+}
 </script>
 </body>
 </html>
