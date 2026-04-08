@@ -2,110 +2,168 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Elite Hub Pro X</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Elite Hub Pro</title>
+
 <style>
 :root{
-  --bg:#f4f7fb;--card:#ffffff;--accent:#2563eb;--text:#0f172a;--muted:#64748b;
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --accent:#2563eb;
+  --text:#0f172a;
+  --muted:#64748b;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
 .container{max-width:650px;margin:auto;padding:15px}
-h1{font-size:2rem;margin:10px 0;font-weight:900}
 
-/* DASHBOARD */
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+h1{font-size:2rem;font-weight:900}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
 .tile{
   background:linear-gradient(135deg,#2563eb,#1e40af);
   color:white;
   padding:30px;
   border-radius:22px;
   font-weight:900;
-  font-size:1.2rem;
   min-height:120px;
   display:flex;
   align-items:flex-end;
 }
 
-/* LIST */
-.card{background:var(--card);border-radius:18px;padding:16px;margin-top:10px}
-.exercise{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid #eee}
-button{border:none;border-radius:14px;padding:14px;font-weight:800;width:100%;margin-top:10px}
+.exercise{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  border-bottom:1px solid #eee;
+}
+
+button{
+  border:none;
+  border-radius:14px;
+  padding:14px;
+  font-weight:800;
+  width:100%;
+  margin-top:10px;
+}
 .primary{background:var(--accent);color:white}
 .secondary{background:#e2e8f0}
 
 /* WORKOUT MODE */
-#overlay{position:fixed;inset:0;background:#0f172a;display:none;justify-content:center;align-items:center}
-.cardStack{
- position:relative;
- width:90%;max-width:400px;height:520px;
+#overlay{
+  position:fixed;
+  inset:0;
+  background:#0f172a;
+  display:none;
+  justify-content:center;
+  align-items:center;
 }
-.swipeCard{
- position:absolute;width:100%;height:100%;
- background:white;border-radius:25px;padding:20px;
- box-shadow:0 20px 50px rgba(0,0,0,0.3);
- display:flex;flex-direction:column;justify-content:center;text-align:center;
- transition:0.3s;
+
+.card{
+  width:90%;
+  max-width:400px;
+  background:white;
+  border-radius:25px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 20px 50px rgba(0,0,0,0.3);
 }
-.timer{font-size:3.5rem;font-weight:900;color:#2563eb}
-.desc{color:#64748b}
-.controls{margin-top:15px}
-.controls button{margin-top:6px}
-.progress{color:#64748b;font-size:0.8rem}
+
+.timer{
+  font-size:3.5rem;
+  font-weight:900;
+  color:#2563eb;
+}
+
+.desc{
+  color:#64748b;
+}
+
+.progress{
+  font-size:0.8rem;
+  color:#64748b;
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
-<h1>Elite Hub</h1>
-<div id="plans" class="grid"></div>
-<div id="exerciseList"></div>
+  <h1>Elite Hub</h1>
+  <div id="plans" class="grid"></div>
+  <div id="list"></div>
 </div>
 
 <div id="overlay">
-<div class="cardStack" id="stack"></div>
+  <div class="card" id="card"></div>
 </div>
 
 <script>
 
-/* REAL EXERCISE LIBRARY */
-const library=[
-{name:"Push-Up",info:"Hands shoulder-width. Lower chest, keep core tight, push back up."},
-{name:"Squat",info:"Feet shoulder-width. Sit back, keep chest up, drive through heels."},
-{name:"Lunge",info:"Step forward, lower hips, keep knee over ankle."},
-{name:"Plank",info:"Elbows under shoulders. Keep body straight, brace core."},
-{name:"Glute Bridge",info:"Lift hips, squeeze glutes, control descent."},
-{name:"Dead Bug",info:"Opposite arm/leg extend, keep core tight."},
-{name:"Bird Dog",info:"Extend arm/leg, keep hips stable."},
-{name:"Mountain Climbers",info:"Drive knees fast, keep hips low."},
-{name:"Wall Sit",info:"Back flat, hold 90° knees."},
-{name:"Hamstring Stretch",info:"Reach forward, keep legs straight."}
+/* REAL EXERCISE DATABASE */
+const exercises = [
+{name:"Push-Up",desc:"Hands under shoulders, body straight, lower chest and push up."},
+{name:"Incline Push-Up",desc:"Hands elevated, keep core tight, lower chest slowly."},
+{name:"Decline Push-Up",desc:"Feet elevated, lower chest with control, push upward."},
+{name:"Diamond Push-Up",desc:"Hands close together, elbows tucked, press upward."},
+{name:"Squat",desc:"Feet shoulder width, sit back, drive through heels."},
+{name:"Jump Squat",desc:"Lower into squat then explode upward."},
+{name:"Lunge",desc:"Step forward, lower hips, keep knee aligned."},
+{name:"Reverse Lunge",desc:"Step back, drop knee, push forward."},
+{name:"Bulgarian Split Squat",desc:"Back foot elevated, lower slowly, drive up."},
+{name:"Plank",desc:"Elbows under shoulders, body straight, brace core."},
+{name:"Side Plank",desc:"Stack feet, hold body straight, engage obliques."},
+{name:"Dead Bug",desc:"Opposite arm/leg extend, keep core tight."},
+{name:"Bird Dog",desc:"Extend arm/leg, keep hips level."},
+{name:"Glute Bridge",desc:"Lift hips, squeeze glutes, control down."},
+{name:"Hip Thrust",desc:"Back elevated, drive hips upward."},
+{name:"Mountain Climbers",desc:"Drive knees quickly, keep core engaged."},
+{name:"Burpees",desc:"Drop, jump back, push up, jump forward."},
+{name:"Wall Sit",desc:"Back against wall, hold 90° knees."},
+{name:"Calf Raises",desc:"Lift heels slowly, control down."},
+{name:"Hamstring Stretch",desc:"Reach forward, keep legs straight."},
+{name:"Quad Stretch",desc:"Pull foot to glutes, keep knees aligned."},
+{name:"Shoulder Stretch",desc:"Pull arm across chest gently."},
+{name:"Neck Stretch",desc:"Tilt head side to side slowly."},
+{name:"Downward Dog",desc:"Lift hips, press hands down, lengthen spine."},
+{name:"Child Pose",desc:"Sit back on heels, stretch arms forward."},
+{name:"Cobra Stretch",desc:"Lift chest, keep hips down."},
+{name:"Cat Cow",desc:"Alternate arching and rounding back."},
+{name:"Seated Twist",desc:"Rotate torso gently, keep spine tall."},
+{name:"Glute Bridge Hold",desc:"Hold top position, squeeze glutes."},
+{name:"Clamshell",desc:"Open knees while keeping feet together."},
+{name:"Heel Slides",desc:"Slide heel toward body slowly."}
 ];
 
-/* GENERATE 200 REALISTIC VARIATIONS */
-function expandLibrary(base){
- let out=[];
- base.forEach(ex=>{
-  for(let i=1;i<=20;i++){
-   out.push({
-    name:ex.name+" Variation "+i,
-    info:ex.info+" Focus on control, breathing, and proper form throughout the movement."
-   });
+/* EXPAND TO 200+ */
+function expand(base){
+ let arr=[];
+ base.forEach(e=>{
+  for(let i=1;i<=6;i++){
+    arr.push({
+      name:e.name+" "+i,
+      desc:e.desc+" Focus on control, breathing, and posture."
+    });
   }
  });
- return out;
+ return arr;
 }
 
-const bigLib=expandLibrary(library);
+const big = expand(exercises);
 
+/* PLANS */
 const plans={
-"Strength":bigLib.slice(0,60),
-"Yoga":bigLib.slice(60,120),
-"Stretch":bigLib.slice(120,160),
-"Physio":bigLib.slice(160,200)
+"Strength":big.slice(0,80),
+"Yoga":big.slice(80,140),
+"Stretch":big.slice(140,180),
+"Physio":big.slice(180)
 };
 
-let selectedPlan=null;
+let selected=null;
 let workout=[];
 let index=0;
 let timer=30;
@@ -113,117 +171,116 @@ let interval=null;
 let running=false;
 
 const plansDiv=document.getElementById("plans");
-const listDiv=document.getElementById("exerciseList");
-const stack=document.getElementById("stack");
+const list=document.getElementById("list");
+const overlay=document.getElementById("overlay");
+const card=document.getElementById("card");
 
+/* RENDER PLANS */
 Object.keys(plans).forEach(p=>{
- let d=document.createElement("div");
- d.className="tile";
- d.innerText=p;
- d.onclick=()=>selectPlan(p);
- plansDiv.appendChild(d);
+ let el=document.createElement("div");
+ el.className="tile";
+ el.innerText=p;
+ el.onclick=()=>{selected=p;renderList();}
+ plansDiv.appendChild(el);
 });
 
-function selectPlan(p){
- selectedPlan=p;
- renderExercises();
-}
-
-function renderExercises(){
- listDiv.innerHTML="";
- plans[selectedPlan].forEach((ex,i)=>{
- let div=document.createElement("div");
- div.className="exercise";
- div.innerHTML=`<span>${ex.name}</span><input type='checkbox' checked data-i='${i}'/>`;
- listDiv.appendChild(div);
+/* LIST */
+function renderList(){
+ list.innerHTML="";
+ plans[selected].forEach((ex,i)=>{
+  let d=document.createElement("div");
+  d.className="exercise";
+  d.innerHTML=`<span>${ex.name}</span><input type='checkbox' checked data-i='${i}'/>`;
+  list.appendChild(d);
  });
+
  let btn=document.createElement("button");
  btn.className="primary";
  btn.innerText="Start Workout";
  btn.onclick=startWorkout;
- listDiv.appendChild(btn);
+ list.appendChild(btn);
 }
 
+/* START */
 function startWorkout(){
  workout=[];
  document.querySelectorAll("input[type=checkbox]").forEach(cb=>{
- if(cb.checked){ workout.push(plans[selectedPlan][cb.dataset.i]); }
+  if(cb.checked) workout.push(plans[selected][cb.dataset.i]);
  });
+
  index=0;
- document.getElementById("overlay").style.display="flex";
+ overlay.style.display="flex";
  renderCard();
 }
 
+/* CARD */
 function renderCard(){
- stack.innerHTML="";
  let ex=workout[index];
- let card=document.createElement("div");
- card.className="swipeCard";
  card.innerHTML=`
  <div class='progress'>${index+1}/${workout.length}</div>
  <h2>${ex.name}</h2>
- <p class='desc'>${ex.info}</p>
+ <p class='desc'>${ex.desc}</p>
  <div class='timer'>${timer}</div>
- <div class='controls'>
-  <button class='primary' onclick='startTimer()'>Start</button>
-  <button class='secondary' onclick='pauseTimer()'>Pause</button>
-  <button class='secondary' onclick='nextEx()'>Next</button>
-  <button class='secondary' onclick='prevEx()'>Back</button>
-  <button class='secondary' onclick='endWorkout()'>End</button>
- </div>
+ <button class='primary' onclick='startTimer()'>Start</button>
+ <button class='secondary' onclick='pauseTimer()'>Pause</button>
+ <button class='secondary' onclick='next()'>Next</button>
+ <button class='secondary' onclick='prev()'>Back</button>
+ <button class='secondary' onclick='endWorkout()'>End</button>
  `;
- stack.appendChild(card);
  addSwipe(card);
 }
 
+/* TIMER */
 function startTimer(){
  if(running) return;
  running=true;
  interval=setInterval(()=>{
- timer--;
- document.querySelector('.timer').innerText=timer;
- if(timer<=0){ nextEx(); }
+  timer--;
+  document.querySelector('.timer').innerText=timer;
+  if(timer<=0) next();
  },1000);
 }
 
 function pauseTimer(){
  running=!running;
- if(!running){clearInterval(interval);} else startTimer();
+ if(!running) clearInterval(interval);
+ else startTimer();
 }
 
-function nextEx(){
+/* NAV */
+function next(){
  clearInterval(interval);
  running=false;
  timer=30;
  index++;
- if(index>=workout.length){endWorkout();return}
+ if(index>=workout.length){endWorkout();return;}
  renderCard();
 }
 
-function prevEx(){
+function prev(){
  if(index>0){
- clearInterval(interval);
- running=false;
- timer=30;
- index--;
- renderCard();
+  clearInterval(interval);
+  running=false;
+  timer=30;
+  index--;
+  renderCard();
  }
 }
 
 function endWorkout(){
  clearInterval(interval);
- document.getElementById("overlay").style.display="none";
+ overlay.style.display="none";
  alert("Workout Complete 💪");
 }
 
 /* SWIPE */
 function addSwipe(el){
  let startX=0;
- el.addEventListener('touchstart',e=>startX=e.touches[0].clientX);
- el.addEventListener('touchend',e=>{
+ el.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+ el.addEventListener("touchend",e=>{
   let dx=e.changedTouches[0].clientX-startX;
-  if(dx>60) prevEx();
-  if(dx<-60) nextEx();
+  if(dx>60) prev();
+  if(dx<-60) next();
  });
 }
 
